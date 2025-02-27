@@ -1,0 +1,32 @@
+﻿* Transaction Table Columns:
+	Id INTEGER,
+	DateTime TEXT,
+	Amount DECIMAL,
+	TransactionType INTEGER,
+	IsImportant BOOL,
+	Keywords TEXT,
+	Category INTEGER,
+	Title TEXT,
+	Note TEXT,
+	ImagePath TEXT
+
+* Category Table Comuns:
+	Id INTEGER,
+	CategoryType INTEGER,
+	Title TEXT,
+	IsDefault BOOL,
+	Note TEXT
+
+* Accounts Table Columns:
+	Id INTEGER,
+	BeginningDate TEXT,
+	EndDate TEXT,
+	ExpensesSum DECIMAL,
+	DebtSum DECIMAL,
+	OwedSum DECIMAL,
+	EarningSum DECIMAL
+
+
+* Keywords Table Columns:
+	Id INTEGER,
+	Word TEXT

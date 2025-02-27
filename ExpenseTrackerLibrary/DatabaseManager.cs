@@ -8,18 +8,54 @@ namespace ExpenseTrackerLibrary
 {
     internal static class DatabaseManager
     {
-        private static class DatabaseWriter
+        private static string connectionString = @"Data Source=Expense_Logs.sq";
+
+
+        /// <summary>
+        /// Contains methods for adding and editing of the database and its tables.
+        /// </summary>
+        internal static class DatabaseWriter
         {
             // Unsure of this design for now.
         }
 
-        private static class DatabaseReader
+        /// <summary>
+        /// Contains methods for reading from the database.
+        /// </summary>
+        internal static class DatabaseReader
         {
             internal static Transaction GetAllTransactionsByDate (DateTime from, DateTime until)
             {
                 // Not sure if the DatabaseManager class should be like this (nested classes).
                 // Think of a suitable structure first, and then write the code for this part.
                 return null;
+            }
+
+            /// <summary>
+            /// Finds and returns a category using its Id. returns null if it doesn't exist.
+            /// </summary>
+            /// <param name="categoryId"></param>
+            /// <returns></returns>
+            internal static Category? GetCategory (int categoryId)
+            {
+                Category foundCategory;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var databaseQuery = databaseConnection.CreateCommand();
+                    databaseQuery.CommandText = $"SELECT Id, FROM Category_Logs, WHERE Id = '{categoryId}'";
+                    var filteredDatabaseReader = databaseQuery.ExecuteReader();
+                    if (filteredDatabaseReader.HasRows)
+                    {
+                        foundCategory = SqlToCategory.SQLiteReaderToCategory(filteredDatabaseReader);
+                        return foundCategory;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
             }
         }
 

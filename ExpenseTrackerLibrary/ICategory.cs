@@ -16,6 +16,10 @@ namespace ExpenseTrackerLibrary
         /// </summary>
         int Id { get; }
         /// <summary>
+        /// Specifies the type of this category.
+        /// </summary>
+        Globals.CategoryTypes CategoryType { get; set; }
+        /// <summary>
         /// The name of the category.
         /// </summary>
         string Title { get; set; }
@@ -24,32 +28,12 @@ namespace ExpenseTrackerLibrary
         /// </summary>
         bool isDefaultCategory { get; }
         /// <summary>
-        /// Specifies whether this category has any subcategories.
-        /// </summary>
-        bool hasSubcategory { get; }
-        /// <summary>
-        /// The total amount of the expenses in this category.
-        /// </summary>
-        int ExpensesSum { get; }
-        /// <summary>
-        /// The total amount of earnings from this category.
-        /// </summary>
-        int EarningsSum { get; }
-        /// <summary>
-        /// The total amount of money the user must receive from others in this category.
-        /// </summary>
-        int OwedSum { get; }
-        /// <summary>
-        /// The total amount of money the user must give others from this category.
-        /// </summary>
-        int DebtSum { get; }
-        /// <summary>
         /// Notes and additional information about this category.
         /// </summary>
         string? Note {  get; set; }
         /// <summary>
         /// The transactions that are in this category. Returns null if nothing is found.
         /// </summary>
-        Transaction[]? Transactions { get; }
+        Transaction[]? GetTransactions();
     }
 }

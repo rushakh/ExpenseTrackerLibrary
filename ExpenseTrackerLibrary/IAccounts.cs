@@ -25,27 +25,27 @@ namespace ExpenseTrackerLibrary
         /// All of the transactions that were recorded for this period of time. Returns an array of type Transaction.
         /// Returns null if no transaction is found.
         /// </summary>
-        Transaction[]? Transactions { get; }
+        Transaction[]? Transactions { get; }              
 
         /// <summary>
         /// The total amount of recorded Expenses for the specified period of time. 
         /// </summary>
-        int ExpenseSum { get; }
+        float ExpenseSum { get; }
 
         /// <summary>
         /// The total amount of recorded Debts for the specified period of time.
         /// </summary>
-        int DebtSum { get; }
+        float DebtSum { get; }
 
         /// <summary>
         /// The total amount of recorded Oweds (by others) for the specified period of time.
         /// </summary>
-        int OwedSum { get; }
+        float OwedSum { get; }
 
         /// <summary>
         /// The total amount of recorded Earnings for the specified period of time.
         /// </summary>
-        int EarningSum { get; }
+        float EarningSum { get; }
 
         /// <summary>
         /// All of the recorded Transactions that were marked as Expense for the specified period of time. Returns
