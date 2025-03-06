@@ -34,13 +34,41 @@ namespace ExpenseTrackerLibrary
 
         public bool IsImportant { get => _isImportant; set => _isImportant = value; }
 
-        public string[]? Keywords { get => _keywords; set => _keywords = value; }
+        public string[]? Keywords 
+        {
+            get 
+            { 
+                return _keywords;
+            }
+            set 
+            { 
+                _keywords = value;
+                if (_keywords is not null && _keywords.Length > 0)
+                {
+                    _hasKeywords = true;
+                }
+            } 
+        }
 
         public Category Category { get => _category; set => _category = value; }
 
         public string? Title { get => _title; set => _title = value; }
 
-        public string? Note { get => _note; set => _note = value; }
+        public string? Note 
+        {
+            get 
+            { 
+                return _note;
+            }
+            set 
+            {
+                _note = value;
+                if (_note is not null && _note != string.Empty)
+                {
+                    _hasNote = true;
+                }
+            } 
+        }
 
         public string? ImagePath { get => _imagePath; set => _imagePath = value; }
 
@@ -73,35 +101,36 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="note"></param>
         /// <param name="imagePath"></param>
-        public Transaction (DateTime date, float amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
+        public Transaction (DateTime dateAndTime, float amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
         {
-            // Databasemanger class and the method that is used has not been written yet***.
-            _id = DatabaseManager.GetNewTransactionId();
             _transactionType = type;
-            _dateTime = date;
+            _dateTime = dateAndTime;
             _amount = amount;
             _isImportant = isImportant;
+            // Keywords should preferably be checked to be in the correct format before being used here.
             _keywords = keywords;
-            if (_keywords is null)
+            if (_keywords is not null && _keywords.Length > 0)
             {
-                _hasKeywords = false;
+                _hasKeywords = true;
             }
             else
             {
-                _hasKeywords = true;
+                _hasKeywords = false;
             }
             _title = title;
             _category = category;
             _note = note;
-            if (_note is null)
-            {
-                _hasNote = false;
-            }
-            else
+            if (_note is not null && _note != string.Empty)
             {
                 _hasNote = true;
             }
+            else
+            {
+                _hasNote = false;
+            }
             _imagePath = imagePath;
+            // Should add the Transaction's data to the database, and get the Id now.
+            _id = DatabaseManager.DatabaseWriter.AddTransaction(_dateTime, _amount, _transactionType, _isImportant, _keywords, _category, _title, _note, _imagePath);
         }
 
         /// <summary>
@@ -117,32 +146,32 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="note"></param>
         /// <param name="imagePath"></param>
-        public Transaction (int id, DateTime date, float amount, Globals.TransactionTypes type,  bool isImportant, string[]? keywords, Category category, string? title,  string? note, string? imagePath)
+        public Transaction (int id, DateTime dateAndTime, float amount, Globals.TransactionTypes type,  bool isImportant, string[]? keywords, Category category, string? title,  string? note, string? imagePath)
         {
             _id = id;
             _transactionType = type;
-            _dateTime = date;
+            _dateTime = dateAndTime;
             _amount = amount;
             _isImportant = isImportant;
             _keywords = keywords;
-            if (_keywords is null)
+            if (_keywords is not null && _keywords.Length > 0)
             {
-                _hasKeywords = false;
+                _hasKeywords = true;
             }
             else
             {
-                _hasKeywords = true;
+                _hasKeywords = false;
             }
             _title = title;
             _category = category;
             _note = note;
-            if (_note is null)
+            if (_note is not null && _note != string.Empty)
             {
-                _hasNote = false;
+                _hasNote = true;
             }
             else
             {
-                _hasNote = true;
+                _hasNote = false;
             }
             _imagePath = imagePath;
         }

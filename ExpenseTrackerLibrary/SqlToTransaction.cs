@@ -11,11 +11,35 @@ namespace ExpenseTrackerLibrary
     internal static class SqlToTransaction
     {
         /// <summary>
+        /// Constructs a Transaction object using the database element in the SQLite Reader and returns Transaction.
+        /// Returns only the first element in the reader if there are more than one.
+        /// </summary>
+        /// <param name="sqliteDataReader"></param>
+        /// <returns></returns>
+        internal static Transaction SQLiteReaderToTransaction (SqliteDataReader sqliteDataReader)
+        {
+            Transaction loadedTransaction;
+            sqliteDataReader.Read();
+            int id = sqliteDataReader.GetInt32(0);
+            DateTime dateTime = sqliteDataReader.GetDateTime(1);
+            float amount = (float)sqliteDataReader.GetDouble(2);
+            Globals.TransactionTypes transactionType = (TransactionTypes)sqliteDataReader.GetInt32(3);
+            bool isImportant = sqliteDataReader.GetBoolean(4);
+            string[] keywords = GetKeywords(sqliteDataReader.GetString(5));
+            Category category = GetCategory(sqliteDataReader.GetInt32(6));
+            string? title = sqliteDataReader.GetString(7);
+            string? note = sqliteDataReader.GetString(8);
+            string? imagePath = sqliteDataReader.GetString(9);
+            loadedTransaction = new Transaction(id, dateTime, amount, transactionType, isImportant, keywords, category, title, note, imagePath);
+            return loadedTransaction;
+        }
+
+        /// <summary>
         /// Constructs Transaction objects using the database elements in the SQLite Reader and returns Transaction[].
         /// </summary>
         /// <param name="sqliteDataReader"></param>
         /// <returns></returns>
-        internal static Transaction[] SQLiteReaderToTransaction(SqliteDataReader sqliteDataReader)
+        internal static Transaction[] SQLiteReaderToTransactions (SqliteDataReader sqliteDataReader)
         {            
             List<Transaction> transactions = new List<Transaction>();
             while (sqliteDataReader.Read())
@@ -55,6 +79,7 @@ namespace ExpenseTrackerLibrary
 
         private static DateTime GetDateTime (string SQLiteDateTime)
         {
+            // *** LATER
             return DateTime.MinValue;
         }
 

@@ -39,7 +39,7 @@ namespace ExpenseTrackerLibrary
         /// <summary>
         /// The keywords added by the user that can be used for better searching. Returns string[], or null if nothing was added.
         /// </summary>
-        string[] Keywords { get; set; }
+        string[]? Keywords { get; set; }
 
         /// <summary>
         /// The category that the transaction belongs to.
@@ -60,7 +60,7 @@ namespace ExpenseTrackerLibrary
         /// The location of the Image (a copy andn ot the original file) set by the user for this transaction. Returns null 
         /// if no image was added by the user.
         /// </summary>
-        string ImagePath { get; set; }
+        string? ImagePath { get; set; }
 
         /// <summary>
         /// Specifies whether this transaction contains any keywords added by the user.
