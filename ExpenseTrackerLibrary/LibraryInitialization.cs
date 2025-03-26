@@ -18,10 +18,13 @@ namespace ExpenseTrackerLibrary
         public static void Initialize()
         {
             DatabaseInitialization.DatabaseInit();
+            CreateCategories();
+            /*
             if (!DatabaseManager.DatabaseReader.HasCategories())
             {
-                CreateCategories();
+                
             }
+            */
             CreateKeywords();
         }
 
