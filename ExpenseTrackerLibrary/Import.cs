@@ -14,7 +14,7 @@ namespace ExpenseTrackerLibrary
     /// The Order of Data should be set beforehand otherwise, by default, it's assumed
     /// that its Amount of money, the title, and then the date.
     /// </summary>
-    internal static class Import
+    public static class Import
     {
         private static string _orderOfData = "A,T,D";
         private static Globals.ImportValues _firstImportValue = Globals.ImportValues.Amount;
@@ -59,7 +59,7 @@ namespace ExpenseTrackerLibrary
         /// <param name="importantMarker"></param>
         /// <param name="isDDMMYYYYOrReverse"></param>
         /// <returns></returns>
-        internal static int ImportTransactions(string[] textsToImport, Globals.TransactionTypes transactionType, Category category, string delimiter, string ignore, string? importantMarker, bool isDDMMYYYYOrReverse = true)
+        public static int ImportTransactions(string[] textsToImport, Globals.TransactionTypes transactionType, Category category, string delimiter, string ignore, string? importantMarker, bool isDDMMYYYYOrReverse = true)
         {
             int successCounter = 0;
             if (textsToImport is null || textsToImport.Length == 0) { throw new ArgumentException(); }
@@ -88,7 +88,7 @@ namespace ExpenseTrackerLibrary
         /// <param name="isDDMMYYYYOrReverse"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        internal static bool ImportTransaction (string textToImport, Globals.TransactionTypes transactionType , Category category, string delimiter, string ignore, string? importantMarker, bool isDDMMYYYYOrReverse = true)
+        public static bool ImportTransaction (string textToImport, Globals.TransactionTypes transactionType , Category category, string delimiter, string ignore, string? importantMarker, bool isDDMMYYYYOrReverse = true)
         {
             if (textToImport == string.Empty) { throw new ArgumentException(); }
             bool isSuccessful = false;
