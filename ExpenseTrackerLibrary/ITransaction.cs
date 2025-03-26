@@ -24,7 +24,7 @@ namespace ExpenseTrackerLibrary
         /// <summary>
         /// The amount of money involved in the Transaction.
         /// </summary>
-        float Amount { get; set; }
+        decimal Amount { get; set; }
 
         /// <summary>
         /// The type of transaction that took place; either Expense, Earning, Owed, Debt.
@@ -72,7 +72,6 @@ namespace ExpenseTrackerLibrary
         /// otherwise, there is no note and Note property is null.
         /// </summary>
         bool HasNote { get; }
-
         
     }
 }

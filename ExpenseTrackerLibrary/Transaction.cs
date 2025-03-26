@@ -14,7 +14,7 @@ namespace ExpenseTrackerLibrary
         private int _id;
         private Globals.TransactionTypes _transactionType;
         private DateTime _dateTime;
-        private float _amount;
+        private decimal _amount;
         private bool _isImportant;
         private bool _hasKeywords;
         string[]? _keywords;
@@ -28,7 +28,7 @@ namespace ExpenseTrackerLibrary
 
         public DateTime Date { get => _dateTime; set => _dateTime = value; }
 
-        public float Amount { get => _amount; set => _amount = value; }
+        public decimal Amount { get => _amount; set => _amount = value; }
 
         public Globals.TransactionTypes TransactionType { get => _transactionType; set => _transactionType = value; }
 
@@ -101,7 +101,7 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="note"></param>
         /// <param name="imagePath"></param>
-        public Transaction (DateTime dateAndTime, float amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
+        public Transaction (DateTime dateAndTime, decimal amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
         {
             _transactionType = type;
             _dateTime = dateAndTime;
@@ -146,7 +146,7 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="note"></param>
         /// <param name="imagePath"></param>
-        public Transaction (int id, DateTime dateAndTime, float amount, Globals.TransactionTypes type,  bool isImportant, string[]? keywords, Category category, string? title,  string? note, string? imagePath)
+        public Transaction (int id, DateTime dateAndTime, decimal amount, Globals.TransactionTypes type,  bool isImportant, string[]? keywords, Category category, string? title,  string? note, string? imagePath)
         {
             _id = id;
             _transactionType = type;

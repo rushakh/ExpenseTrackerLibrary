@@ -26,6 +26,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             internal static void TablesInit()
             {
+                // Check the * Database Tables and Columns.txt *
                 TransactionTableInit();
                 CategoryTableInit();
                 AccountsTableInit();
@@ -148,11 +149,6 @@ namespace ExpenseTrackerLibrary
                 databaseConnection.Close();
             }
             DatabaseTables.TablesInit();
-        }
-
-        public static void LoadDatabase ()
-        {
-            // REMOVE? this is Probably not needed.
-        }   
+        } 
     }
 }

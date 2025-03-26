@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,13 +13,11 @@ namespace ExpenseTrackerLibrary
     {
         private static string connectionString = @"Data Source=Expense_Logs.sq";
 
-
         /// <summary>
         /// Contains methods for adding and editing of the database and its tables.
         /// </summary>
         internal static class DatabaseWriter
         {
-
             /// <summary>
             /// Adds a new row to the Transaction_Logs table using the given transaction properties. 
             /// Returns the value of the Id column.
@@ -33,7 +32,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="note"></param>
             /// <param name="imagePath"></param>
             /// <returns></returns>
-            internal static int AddTransaction (DateTime dateAndTime, float amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
+            internal static int AddTransaction (DateTime dateAndTime, decimal amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
             {
                 int transactionId;
                 // In order for the values to be in the correct form and also not null.
@@ -61,73 +60,314 @@ namespace ExpenseTrackerLibrary
                 }
                 return transactionId;
             }
-        
-            internal static int AddCategory ()
+
+            /// <summary>
+            /// Adds a new row to the Category_Logs table using the given category properties. 
+            /// Returns the value of the Id column.
+            /// </summary>
+            /// <param name="categoryType"></param>
+            /// <param name="title"></param>
+            /// <param name="isDefault"></param>
+            /// <param name="note"></param>
+            /// <returns></returns>
+            internal static int AddCategory (Globals.CategoryTypes categoryType, string title, bool isDefault, string? note)
             {
-                // *** NOT WRITTEN
-                return 0;
+                int categoryId;
+                string checkedNote;
+                if (note is not null) { checkedNote = note; }
+                else { checkedNote = string.Empty; }
+
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"INSERT INTO Category_Logs(CategoryType, Title, IsDefault, Note)" +
+                        $"VALUES ('{(int)categoryType}', '{title}', '{isDefault}', '{checkedNote}')" +
+                        $"RETURNING RowId";
+                    categoryId = (int)sqliteCommand.ExecuteScalar();
+                }
+                return categoryId;
             }
 
-            internal static int AddAccount ()
+            /// <summary>
+            /// Adds a new row to the Accounts_Logs table using the given accounts properties. 
+            /// Returns the value of the Id column.
+            /// </summary>
+            /// <param name="beginning"></param>
+            /// <param name="end"></param>
+            /// <param name="expensesSum"></param>
+            /// <param name="debtSum"></param>
+            /// <param name="owedSum"></param>
+            /// <param name="earningSum"></param>
+            /// <returns></returns>
+            internal static int AddAccount (DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
             {
-                // *** Not Written
-                return 0;
+                int accountsId;               
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"INSERT INTO Accounts_Logs(BeginningDate, EndDate, ExpensesSum, DebtSum, OwedSum, EarningSum)" +
+                        $"VALUES ('{beginning.ToString()}', '{end.ToString()}', '{expensesSum}', '{debtSum}', '{owedSum}', '{earningSum}')" +
+                        $"RETURNING RowId";
+                    accountsId = (int)sqliteCommand.ExecuteScalar();
+                }
+                return accountsId;
             }
 
-            internal static int AddKeyword ()
+            /// <summary>
+            /// Adds a new row to the Keywords_Logs table using the given keyword properties. 
+            /// Returns the value of the Id column.
+            /// </summary>
+            /// <param name="keyword"></param>
+            /// <returns></returns>
+            internal static int AddKeyword (string keyword)
             {
-                // *** Not Written
-                return 0;
+                int keywordId;
+                string checkedKeyword;
+                if (keyword is not null) { checkedKeyword = keyword; }
+                else { checkedKeyword = string.Empty; }
+                    using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                    {
+                        databaseConnection.ConnectionString = connectionString;
+                        databaseConnection.Open();
+                        var sqliteCommand = databaseConnection.CreateCommand();
+                        sqliteCommand.CommandText =
+                            $"INSERT INTO Accounts_Logs(Word)" +
+                            $"VALUES ('{checkedKeyword}')" +
+                            $"RETURNING RowId";
+                    keywordId = (int)sqliteCommand.ExecuteScalar();
+                    }
+                return keywordId;
             }
 
-            internal static bool UpdateTransaction ()
+            /// <summary>
+            /// Updates the values of a row in the Transaction_Logs table using the updated transaction. 
+            /// Returns the number of Rows that were affected (should not be more than one since Id is used 
+            /// as the condition).
+            /// </summary>
+            /// <param name="editedTransaction"></param>
+            /// <returns></returns>
+            internal static int UpdateTransaction (Transaction editedTransaction)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                string theDateTime = editedTransaction.Date.ToString();
+                decimal amount = editedTransaction.Amount;
+                int type = (int)editedTransaction.TransactionType;
+                int categoryId = editedTransaction.Category.Id;
+                bool isImportant = editedTransaction.IsImportant;
+                // In order for the values to be in the correct form and also not null.
+                string checkedKeywords, theTitle, theNote, theImagePath;
+                if (editedTransaction.Keywords is not null) { checkedKeywords = string.Join(", ", editedTransaction.Keywords); }
+                else { checkedKeywords = string.Empty; }
+                if (editedTransaction.Title is not null) { theTitle = editedTransaction.Title; }
+                else { theTitle = string.Empty; }
+                if (editedTransaction.Note is not null) { theNote = editedTransaction.Note; }
+                else { theNote = string.Empty; }
+                if (editedTransaction.ImagePath is not null) { theImagePath = editedTransaction.ImagePath; }
+                else { theImagePath = string.Empty; }
+
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"UPDATE Transaction_Logs" +
+                        $"SET DateTime = '{theDateTime}', Amount = '{amount}', TransactionType = '{type}', IsImportant = '{isImportant}', Keywords = '{checkedKeywords}', Category = '{categoryId}', Title = '{theTitle}', Note = '{theNote}', ImagePath = '{theImagePath}')" +
+                        $"WHERE Id = '{editedTransaction.Id}';";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool UpdateCategory ()
+            /// <summary>
+            /// Updates the values of a row in the Category_Logs table using the updated category. 
+            /// Returns the number of Rows that were affected (should not be more than one since Id is used 
+            /// as the condition).
+            /// </summary>
+            /// <param name="editedCategory"></param>
+            /// <returns></returns>
+            internal static int UpdateCategory (Category editedCategory)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                int categoryId = editedCategory.Id;
+                int type = (int)editedCategory.CategoryType;
+                string title = editedCategory.Title;
+                bool isDefault = editedCategory.isDefaultCategory;
+                string note;
+                if (editedCategory.Note is not null) { note = editedCategory.Note; }
+                else { note = string.Empty; }
+
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"UPDATE Category_Logs" +
+                        $"SET CategoryType = '{categoryId}', Title = '{title}', IsDefault = '{isDefault}', Note = '{note}'" +
+                        $"WHERE Id = '{editedCategory.Id}';";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool UpdateAccount()
+            /// <summary>
+            /// Updates the values of a row in the Accounts_Logs table using the updated accounts. 
+            /// Returns the number of Rows that were affected (should not be more than one since Id is used 
+            /// as the condition).
+            /// </summary>
+            /// <param name="editedAccounts"></param>
+            /// <returns></returns>
+            internal static int UpdateAccount(Accounts editedAccounts)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                int accountsId = editedAccounts.Id;
+                string beginDate = editedAccounts.Beginning.ToString();
+                string endDate = editedAccounts.End.ToString();
+                decimal expense = editedAccounts.ExpenseSum;
+                decimal debt = editedAccounts.DebtSum;
+                decimal owed = editedAccounts.OwedSum;
+                decimal earning = editedAccounts.EarningSum;
+
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"UPDATE Accounts_Logs" +
+                        $"SET BeginningDate = '{beginDate}', EndDate = '{endDate}', ExpensesSum = '{expense}', DebtSum = '{debt}', OwedSum = '{owed}', EarningSum = '{earning}'" +
+                        $"WHERE Id = '{editedAccounts.Id}';";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool UpdateKeyword()
+            /// <summary>
+            /// Updates the values of a row in the Keywords_Logs table using the old and new keyword. 
+            /// Returns the number of Rows that were affected.
+            /// </summary>
+            /// <param name="keyword"></param>
+            /// <param name="editedKeyword"></param>
+            /// <returns></returns>
+            internal static int UpdateKeyword(string keyword, string editedKeyword)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"UPDATE Keywords_Logs" +
+                        $"SET Word = '{editedKeyword}'" +
+                        $"WHERE Word = '{keyword}';";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool DeleteTransaction ()
+            /// <summary>
+            /// Removes a row from the Transaction_Logs table using Id. Returns the number of Rows that 
+            /// were affected (should not be more than one since Id is used as the condition).
+            /// </summary>
+            /// <param name="transactionId"></param>
+            /// <returns></returns>
+            internal static int DeleteTransaction (int transactionId)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"DELETE FROM Transaction_Logs" +
+                        $"WHERE Id = '{transactionId}'";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool DeleteCategory()
+            /// <summary>
+            /// Removes a row from the Category_Logs table using Id. Returns the number of Rows that 
+            /// were affected (should not be more than one since Id is used as the condition).
+            /// </summary>
+            /// <param name="categoryId"></param>
+            /// <returns></returns>
+            internal static int DeleteCategory(int categoryId)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"DELETE FROM Category_Logs" +
+                        $"WHERE Id = '{categoryId}'";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool DeleteAccount ()
+            /// <summary>
+            /// Removes a row from the Accounts_Logs table using Id. Returns the number of Rows that 
+            /// were affected (should not be more than one since Id is used as the condition).
+            /// </summary>
+            /// <param name="accountsId"></param>
+            /// <returns></returns>
+            internal static int DeleteAccounts (int accountsId)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"DELETE FROM Accounts_Logs" +
+                        $"WHERE Id = '{accountsId}'";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
 
-            internal static bool DeleteKeyword ()
+            /// <summary>
+            /// Removes a row from the Keywords_Logs table using Id. Returns the number of Rows that 
+            /// were affected.
+            /// </summary>
+            /// <param name="keyword"></param>
+            /// <returns></returns>
+            internal static int DeleteKeyword (string keyword)
             {
-                // *** Not Written
-                return false;
+                int affectedRows;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var sqliteCommand = databaseConnection.CreateCommand();
+                    sqliteCommand.CommandText =
+                        $"DELETE FROM Keywords_Logs" +
+                        $"WHERE Word = '{keyword}'";
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                return affectedRows;
             }
-
         }
 
         /// <summary>
@@ -135,6 +375,32 @@ namespace ExpenseTrackerLibrary
         /// </summary>
         internal static class DatabaseReader
         {
+            /// <summary>
+            /// Checks if the database has any categories.
+            /// </summary>
+            /// <returns></returns>
+            internal static bool HasCategories()
+            {
+                bool hasCategories;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var databaseQuery = databaseConnection.CreateCommand();
+                    databaseQuery.CommandText = $"SELECT * FROM Category_Logs";
+                    var filteredDatabaseReader = databaseQuery.ExecuteReader();
+                    if (filteredDatabaseReader.HasRows)
+                    {
+                        hasCategories = true;
+                    }
+                    else
+                    {
+                        hasCategories = false;
+                    }
+                }
+                return hasCategories;
+            }
+
             /// <summary>
             /// Loads and returns all the transactions in the database as array.
             /// </summary>
@@ -329,9 +595,11 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="amount"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (float amount)
+            internal static Transaction[]? GetTransactions (decimal amount)
             {
                 // **** DOUBLE CHECK I'm not sure about the DECIMAL and float in here.
+                // **** MIGHT BE BETTER to change the command text to LIKE to find the pattern instead
+                // of the specific number.
                 Transaction[] foundTransactions;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
                 {
@@ -418,20 +686,5 @@ namespace ExpenseTrackerLibrary
             }
 
         }      
-
-        /// <summary>
-        /// Returns an integar that can be used as an identification number for a new transaction.
-        /// </summary>
-        /// <returns></returns>
-        internal static int GetNewCategoryId ()
-        {
-            int lastId = 0;
-            // Check the last database Entry id and then + 1
-            int newId = lastId + 1;
-            // OR Directly add the new entry to the database and Then check the id that was determined for it
-            // and use that. 2nd way is safer, but has extra steps.
-            return newId;
-        }
-
     }
 }

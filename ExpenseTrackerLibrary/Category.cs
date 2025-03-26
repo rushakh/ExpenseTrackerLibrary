@@ -18,7 +18,6 @@ namespace ExpenseTrackerLibrary
         private string? _note;
 
         // LATER should also add IMAGE AND COLOR Attributes Or maybe that should be done somewhere else.
-        // SHOULD Query based on Category, Get the 
 
         public int Id { get => _id; }
 
@@ -31,6 +30,22 @@ namespace ExpenseTrackerLibrary
         public string? Note { get => _note; set => _note = value; }
 
         /// <summary>
+        /// Constructor that allows for constructing new Category objects.
+        /// </summary>
+        /// <param name="categoryType"></param>
+        /// <param name="title"></param>
+        /// <param name="isDefault"></param>
+        /// <param name="note"></param>
+        public Category(Globals.CategoryTypes categoryType, string title, bool isDefault, string? note)
+        {
+            _categoryType = categoryType;
+            _title = title;
+            _note = note;
+            _isDefaultCategory = isDefault;
+            _id = DatabaseManager.DatabaseWriter.AddCategory(_categoryType, _title, _isDefaultCategory, _note);
+        }
+
+        /// <summary>
         /// Constructor for loading already existing Categories.
         /// </summary>
         /// <param name="id"></param>
@@ -38,35 +53,19 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="isDefault"></param>
         /// <param name="note"></param>
-        public Category (int id, int categoryType, string title, bool isDefault, string note)
+        public Category (int id, int categoryType, string title, bool isDefault, string? note)
         {
             _id = id;
             _categoryType = (Globals.CategoryTypes)categoryType;
             _title = title;
             _isDefaultCategory = isDefault;
             _note = note;
-        }
-
-        /// <summary>
-        /// Constructor that allows for constructing new Category objects.
-        /// </summary>
-        /// <param name="categoryType"></param>
-        /// <param name="title"></param>
-        /// <param name="isDefault"></param>
-        /// <param name="note"></param>
-        public Category (Globals.CategoryTypes categoryType, string title, bool isDefault, string note)
-        {
-            _id = DatabaseManager.GetNewCategoryId();
-            _categoryType = categoryType;
-            _title = title;
-            _note = note;
-            _isDefaultCategory = isDefault;
         }       
 
         public Transaction[]? GetTransactions ()
         {
-            // **** LATER
-            return null;
+            var categoryTransactions = DatabaseManager.DatabaseReader.GetTransactions(this);
+            return categoryTransactions;
         }
     }
 }

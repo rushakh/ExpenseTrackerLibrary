@@ -1,4 +1,6 @@
-﻿* Transaction Table Columns:
+﻿* Id is Auto Inc Primary Key in all of them --> Therefore it's the same as RowId.
+
+* Transaction Table Columns:
 	Id INTEGER,
 	DateTime TEXT,
 	Amount DECIMAL,
@@ -25,7 +27,6 @@
 	DebtSum DECIMAL,
 	OwedSum DECIMAL,
 	EarningSum DECIMAL
-
 
 * Keywords Table Columns:
 	Id INTEGER,

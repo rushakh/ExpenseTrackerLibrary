@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Transactions;
 
 namespace ExpenseTrackerLibrary
 {
@@ -8,21 +9,23 @@ namespace ExpenseTrackerLibrary
     /// </summary>
     public class Accounts : IAccounts
     {
+        private int _id;
         private DateTime _beginning;
         private DateTime _end;
         private Transaction[]? _transactions;
-        private float _expenseSum;
-        private float _debtSum;
-        private float _owedSum;
-        private float _earningSum;
+        private decimal _expenseSum;
+        private decimal _debtSum;
+        private decimal _owedSum;
+        private decimal _earningSum;
 
+        public int Id { get => _id; }
         public DateTime Beginning { get => _beginning; }
         public DateTime End { get => _end; }
         public Transaction[]? Transactions { get => _transactions; }       
-        public float ExpenseSum { get => _expenseSum; }
-        public float DebtSum { get => _debtSum; }
-        public float OwedSum { get => _owedSum; }
-        public float EarningSum { get => _earningSum; }
+        public decimal ExpenseSum { get => _expenseSum; }
+        public decimal DebtSum { get => _debtSum; }
+        public decimal OwedSum { get => _owedSum; }
+        public decimal EarningSum { get => _earningSum; }
 
         /// <summary>
         /// Constructor for creating an object of type Accounts that contains the financial accounts
@@ -32,9 +35,33 @@ namespace ExpenseTrackerLibrary
         /// <param name="end"></param>
         public Accounts (DateTime beginning, DateTime end)
         {
-            // ***
-            // get the transactions from the database and populate _transactions[].
+            _beginning = beginning;
+            _end = end;
+            _transactions = DatabaseManager.DatabaseReader.GetTransactions(beginning, end);
             CalculateAccounts();
+            _id = DatabaseManager.DatabaseWriter.AddAccount(_beginning, _end, _expenseSum, _debtSum, _owedSum, _earningSum);
+        }
+
+        /// <summary>
+        /// Constructor for loading an object of type Accounts that contains the financial accounts 
+        /// of a specified period of time from the database. 
+        /// </summary>
+        /// <param name="accountsId"></param>
+        /// <param name="beginning"></param>
+        /// <param name="end"></param>
+        public Accounts (int accountsId, DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
+        {
+            // Can either get it from the database, or retrieve it again to calculate the sums.
+            // But either way, will have to retrieve the transactions --> *** Might change this design
+            // GetAccounts (beginning, end);
+            _id = accountsId;
+            _beginning = beginning;
+            _end = end;
+            _expenseSum = expensesSum;
+            _debtSum = debtSum;
+            _owedSum = owedSum;
+            _earningSum = earningSum;
+            _transactions = DatabaseManager.DatabaseReader.GetTransactions(beginning, end);
         }
 
         /// <summary>
@@ -43,7 +70,10 @@ namespace ExpenseTrackerLibrary
         /// <param name="transactions"></param>
         public Accounts(Transaction[] transactions)
         {
-            _transactions = transactions;
+            var orderTransactions = from transaction in transactions
+                                    orderby transaction.Date ascending
+                                    select transaction;
+            _transactions = orderTransactions.ToArray();
             CalculateAccounts();
         }
 
@@ -116,9 +146,9 @@ namespace ExpenseTrackerLibrary
         /// </summary>
         /// <param name="chosenTransactions"></param>
         /// <returns></returns>
-        private float Sum (Transaction[]? chosenTransactions)
+        private decimal Sum (Transaction[]? chosenTransactions)
         {
-            float sum = 0;
+            decimal sum = 0;
             if (chosenTransactions is null)
             {
                 _expenseSum = 0;
