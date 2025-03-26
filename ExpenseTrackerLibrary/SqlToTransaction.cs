@@ -28,7 +28,7 @@ namespace ExpenseTrackerLibrary
                 sqliteDataReader.Read();
                 int id = sqliteDataReader.GetInt32(0);
                 DateTime dateTime = sqliteDataReader.GetDateTime(1);
-                float amount = (float)sqliteDataReader.GetDouble(2);
+                decimal amount = (decimal)sqliteDataReader.GetDouble(2);
                 Globals.TransactionTypes transactionType = (TransactionTypes)sqliteDataReader.GetInt32(3);
                 bool isImportant = sqliteDataReader.GetBoolean(4);
                 string[] keywords = GetKeywords(sqliteDataReader.GetString(5));
@@ -61,7 +61,7 @@ namespace ExpenseTrackerLibrary
                 {
                     int id = sqliteDataReader.GetInt32(0);
                     DateTime dateTime = sqliteDataReader.GetDateTime(1);
-                    float amount = (float)sqliteDataReader.GetDouble(2);
+                    decimal amount = (decimal)sqliteDataReader.GetDouble(2);
                     Globals.TransactionTypes transactionType = (TransactionTypes)sqliteDataReader.GetInt32(3);
                     bool isImportant = sqliteDataReader.GetBoolean(4);
                     string[] keywords = GetKeywords(sqliteDataReader.GetString(5));
