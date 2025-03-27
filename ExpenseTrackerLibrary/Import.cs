@@ -348,9 +348,16 @@ namespace ExpenseTrackerLibrary
         /// <returns></returns>
         private static string RemoveString (string completeString, string toBeRemoved)
         {
-            string editedString = completeString.Replace(toBeRemoved, string.Empty);
-            editedString.Trim();
-            return editedString;
+            if (toBeRemoved is null || toBeRemoved == string.Empty)
+            {
+                return completeString;
+            }
+            else
+            {
+                string editedString = completeString.Replace(toBeRemoved, string.Empty);
+                editedString.Trim();
+                return editedString;
+            }
         }
     }
 }

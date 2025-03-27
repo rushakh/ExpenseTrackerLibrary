@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
+using static ExpenseTrackerLibrary.Globals;
 
 namespace ExpenseTrackerLibrary
 {
     /// <summary>
-    /// Initializes the database and creates the various tables that are required.
+    /// Initializes the database, creates the various tables that are required, and the default Category and Keywords.
     /// </summary>
     public static class DatabaseInitialization
     {
-        private static string connectionString = @"Data Source=Expense_Logs.sqlite";
-        private static string databaseName = "Expense_Logs.sqlite";
+        private static readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
+        private static readonly string databaseName = "Expense_Logs.sqlite";
 
         /// <summary>
         /// Contains the methods for the creation of the database tables.
@@ -132,7 +133,7 @@ namespace ExpenseTrackerLibrary
                     keywordsTable.ExecuteNonQuery();
                     databaseConnection.Close();
                 }
-            }
+            }           
         }
 
         /// <summary>
@@ -149,6 +150,65 @@ namespace ExpenseTrackerLibrary
                 databaseConnection.Close();
             }
             DatabaseTables.TablesInit();
-        } 
+            CreateDefaultCategories();
+            CreateDefaultKeywords();
+        }
+
+        /// <summary>
+        /// Creates the default categories if they do not exist.
+        /// </summary>
+        private static void CreateDefaultCategories()
+        {
+            // Can also use Dictionary and Might do that as well when making changes to the
+            // Subcategory and MainCategory behaviors and distinctions
+            foreach (string title in Globals.defaultMainCategoryTitles)
+            {
+                CreateCategoryIfNotExists(Globals.CategoryTypes.MainCategory, title, true, null);
+            }
+            foreach (string title in Globals.defaultSubCategoryTitles)
+            {
+                CreateCategoryIfNotExists(Globals.CategoryTypes.SubCategory, title, true, null);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a category with that name already exists, and if it doesn't create it.
+        /// </summary>
+        /// <param name="categoryType"></param>
+        /// <param name="title"></param>
+        /// <param name="isdefault"></param>
+        /// <param name="note"></param>
+        private static void CreateCategoryIfNotExists(Globals.CategoryTypes categoryType, string title, bool isdefault, string? note)
+        {
+            bool exists = DatabaseManager.DatabaseReader.CategoryExists(title);
+            if (!exists)
+            {
+                Category defaultCategory = new Category(categoryType, title, isdefault, note);
+            }
+        }
+
+        /// <summary>
+        /// Creates the default Keywords if they do not exist.
+        /// </summary>
+        private static void CreateDefaultKeywords()
+        {
+            foreach(string keyword in Globals.defaultKeywords)
+            {
+                CreateKeywordsIfNotExists(keyword);
+            }
+        }
+
+        /// <summary>
+        /// Checks if a category with that name already exists, and if it doesn't create it.
+        /// </summary>
+        /// <param name="word"></param>
+        private static void CreateKeywordsIfNotExists(string word)
+        {
+            bool exists = DatabaseManager.DatabaseReader.KeywordExists(word);
+            if (!exists)
+            {
+                DatabaseManager.DatabaseWriter.AddKeyword(word);
+            }
+        }
     }
 }

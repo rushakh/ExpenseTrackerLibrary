@@ -9,14 +9,17 @@ using static ExpenseTrackerLibrary.Globals;
 
 namespace ExpenseTrackerLibrary
 {
-    internal static class DatabaseManager
+    /// <summary>
+    /// The class that contains methods for writing into and reading from the database
+    /// </summary>
+     public static class DatabaseManager
     {
-        private static string connectionString = @"Data Source=Expense_Logs.sq";
+        private static readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
 
         /// <summary>
-        /// Contains methods for adding and editing of the database and its tables.
+        /// Contains methods for adding, editing, and deleting of the database table elements.
         /// </summary>
-        internal static class DatabaseWriter
+        public static class DatabaseWriter
         {
             /// <summary>
             /// Adds a new row to the Transaction_Logs table using the given transaction properties. 
@@ -32,7 +35,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="note"></param>
             /// <param name="imagePath"></param>
             /// <returns></returns>
-            internal static int AddTransaction (DateTime dateAndTime, decimal amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
+            public static int AddTransaction (DateTime dateAndTime, decimal amount, Globals.TransactionTypes type, bool isImportant, string[]? keywords, Category category, string? title, string? note, string? imagePath)
             {
                 int transactionId;
                 // In order for the values to be in the correct form and also not null.
@@ -55,7 +58,7 @@ namespace ExpenseTrackerLibrary
                         $"INSERT INTO Transaction_Logs(DateTime, Amount, TransactionType, IsImportant, Keywords, Category, Title, Note, ImagePath) " +
                         $"VALUES ('{dateAndTime.ToString()}', '{amount}', '{(int)type}', '{isImportant}', '{joinedKeywords}', '{category.Id}', '{theTitle}', '{theNote}', '{theImagePath}') " +
                         $"RETURNING RowId;";
-                    transactionId = (int)sqliteCommand.ExecuteScalar();
+                    transactionId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
                     databaseConnection.Close();
                 }
                 return transactionId;
@@ -70,7 +73,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="isDefault"></param>
             /// <param name="note"></param>
             /// <returns></returns>
-            internal static int AddCategory (Globals.CategoryTypes categoryType, string title, bool isDefault, string? note)
+            public static int AddCategory (Globals.CategoryTypes categoryType, string title, bool isDefault, string? note)
             {
                 int categoryId;
                 string checkedNote;
@@ -86,7 +89,7 @@ namespace ExpenseTrackerLibrary
                         $"INSERT INTO Category_Logs(CategoryType, Title, IsDefault, Note)" +
                         $"VALUES ('{(int)categoryType}', '{title}', '{isDefault}', '{checkedNote}')" +
                         $"RETURNING RowId";
-                    categoryId = (int)sqliteCommand.ExecuteScalar();
+                    categoryId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
                 }
                 return categoryId;
             }
@@ -102,7 +105,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="owedSum"></param>
             /// <param name="earningSum"></param>
             /// <returns></returns>
-            internal static int AddAccount (DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
+            public static int AddAccount (DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
             {
                 int accountsId;               
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -114,7 +117,7 @@ namespace ExpenseTrackerLibrary
                         $"INSERT INTO Accounts_Logs(BeginningDate, EndDate, ExpensesSum, DebtSum, OwedSum, EarningSum)" +
                         $"VALUES ('{beginning.ToString()}', '{end.ToString()}', '{expensesSum}', '{debtSum}', '{owedSum}', '{earningSum}')" +
                         $"RETURNING RowId";
-                    accountsId = (int)sqliteCommand.ExecuteScalar();
+                    accountsId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
                 }
                 return accountsId;
             }
@@ -125,7 +128,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="keyword"></param>
             /// <returns></returns>
-            internal static int AddKeyword (string keyword)
+            public static int AddKeyword (string keyword)
             {
                 int keywordId;
                 string checkedKeyword;
@@ -137,10 +140,10 @@ namespace ExpenseTrackerLibrary
                         databaseConnection.Open();
                         var sqliteCommand = databaseConnection.CreateCommand();
                         sqliteCommand.CommandText =
-                            $"INSERT INTO Accounts_Logs(Word)" +
+                            $"INSERT INTO Keywords_Logs(Word)" +
                             $"VALUES ('{checkedKeyword}')" +
                             $"RETURNING RowId";
-                    keywordId = (int)sqliteCommand.ExecuteScalar();
+                    keywordId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
                     }
                 return keywordId;
             }
@@ -152,7 +155,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="editedTransaction"></param>
             /// <returns></returns>
-            internal static int UpdateTransaction (Transaction editedTransaction)
+            public static int UpdateTransaction (Transaction editedTransaction)
             {
                 int affectedRows;
                 string theDateTime = editedTransaction.Date.ToString();
@@ -193,7 +196,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="editedCategory"></param>
             /// <returns></returns>
-            internal static int UpdateCategory (Category editedCategory)
+            public static int UpdateCategory (Category editedCategory)
             {
                 int affectedRows;
                 int categoryId = editedCategory.Id;
@@ -226,7 +229,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="editedAccounts"></param>
             /// <returns></returns>
-            internal static int UpdateAccount(Accounts editedAccounts)
+            public static int UpdateAccount(Accounts editedAccounts)
             {
                 int affectedRows;
                 int accountsId = editedAccounts.Id;
@@ -259,7 +262,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="keyword"></param>
             /// <param name="editedKeyword"></param>
             /// <returns></returns>
-            internal static int UpdateKeyword(string keyword, string editedKeyword)
+            public static int UpdateKeyword(string keyword, string editedKeyword)
             {
                 int affectedRows;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -283,7 +286,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="transactionId"></param>
             /// <returns></returns>
-            internal static int DeleteTransaction (int transactionId)
+            public static int DeleteTransaction (int transactionId)
             {
                 int affectedRows;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -306,7 +309,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="categoryId"></param>
             /// <returns></returns>
-            internal static int DeleteCategory(int categoryId)
+            public static int DeleteCategory(int categoryId)
             {
                 int affectedRows;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -329,7 +332,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="accountsId"></param>
             /// <returns></returns>
-            internal static int DeleteAccounts (int accountsId)
+            public static int DeleteAccounts (int accountsId)
             {
                 int affectedRows;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -352,7 +355,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="keyword"></param>
             /// <returns></returns>
-            internal static int DeleteKeyword (string keyword)
+            public static int DeleteKeyword (string keyword)
             {
                 int affectedRows;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -371,15 +374,15 @@ namespace ExpenseTrackerLibrary
         }
 
         /// <summary>
-        /// Contains methods for reading from the database.
+        /// Contains methods for reading from the database and checking the existance of certain elements.
         /// </summary>
-        internal static class DatabaseReader
+        public static class DatabaseReader
         {
             /// <summary>
             /// Checks if the database has any categories.
             /// </summary>
             /// <returns></returns>
-            internal static bool HasCategories()
+            public static bool HasCategories()
             {
                 bool hasCategories;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -405,7 +408,7 @@ namespace ExpenseTrackerLibrary
             /// Loads and returns all the transactions in the database as array.
             /// </summary>
             /// <returns></returns>
-            internal static Transaction[]? GetAllTransactions ()
+            public static Transaction[]? GetAllTransactions ()
             {
                 Transaction[] foundTransactions;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -433,7 +436,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="transactionId"></param>
             /// <returns></returns>
-            internal static Transaction? GetTransaction (int transactionId)
+            public static Transaction? GetTransaction (int transactionId)
             {
                 Transaction foundTransaction;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -463,7 +466,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="fromDateTime"></param>
             /// <param name="untilDateTime"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (DateTime fromDateTime, DateTime untilDateTime)
+            public static Transaction[]? GetTransactions (DateTime fromDateTime, DateTime untilDateTime)
             {
                 var allTransactions = GetAllTransactions();
                 var foundTransactions = from transaction in allTransactions
@@ -487,7 +490,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="fromId"></param>
             /// <param name="untilId"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions(int fromId, int untilId)
+            public static Transaction[]? GetTransactions(int fromId, int untilId)
             {
                 Transaction[] foundTransactions;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -514,7 +517,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="chosenCategory"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (Category chosenCategory)
+            public static Transaction[]? GetTransactions (Category chosenCategory)
             {
                 Transaction[] foundTransactions;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -541,7 +544,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="keyword"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (string keyword)
+            public static Transaction[]? GetTransactions (string keyword)
             {
                 // It's better for now to search for the keyword in the loaded transactions to prevent
                 // problems occuring, since all keywords are in one column and seperated by a single
@@ -567,7 +570,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="transactionType"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (Globals.TransactionTypes transactionType)
+            public static Transaction[]? GetTransactions (Globals.TransactionTypes transactionType)
             {
                 int typeNum = (int)transactionType;
                 Transaction[] foundTransactions;
@@ -595,7 +598,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="amount"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (decimal amount)
+            public static Transaction[]? GetTransactions (decimal amount)
             {
                 // **** DOUBLE CHECK I'm not sure about the DECIMAL and float in here.
                 // **** MIGHT BE BETTER to change the command text to LIKE to find the pattern instead
@@ -627,7 +630,7 @@ namespace ExpenseTrackerLibrary
             /// <param name="titleOrNote"></param>
             /// <param name="exactMatch"></param>
             /// <returns></returns>
-            internal static Transaction[]? GetTransactions (string titleOrNote, bool exactMatch = false)
+            public static Transaction[]? GetTransactions (string titleOrNote, bool exactMatch = false)
             {
                 Transaction[] foundTransactions;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -663,7 +666,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             /// <param name="categoryId"></param>
             /// <returns></returns>
-            internal static Category? GetCategory (int categoryId)
+            public static Category? GetCategory (int categoryId)
             {
                 Category foundCategory;
                 using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
@@ -685,6 +688,51 @@ namespace ExpenseTrackerLibrary
                 }
             }
 
+            /// <summary>
+            /// Checks if a Category with that name already exists. Returns true if it does, otherwise false.
+            /// </summary>
+            /// <param name="title"></param>
+            /// <returns></returns>
+            /// <exception cref="ArgumentException"></exception>
+            public static bool CategoryExists (string title)
+            {
+                if (title is null || title == string.Empty) { throw new ArgumentException(); }
+                bool exists;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var databaseQuery = databaseConnection.CreateCommand();
+                    databaseQuery.CommandText = $"SELECT Title, FROM Category_Logs, WHERE Title = '{title}'";
+                    var filteredDatabaseReader = databaseQuery.ExecuteReader();
+                    if (filteredDatabaseReader.HasRows) { exists = true; }
+                    else {  exists = false; }
+                }
+                return exists;
+            }
+
+            /// <summary>
+            /// Checks if a keyword already exists. Returns true if it does, otherwise false.
+            /// </summary>
+            /// <param name="word"></param>
+            /// <returns></returns>
+            /// <exception cref="ArgumentException"></exception>
+            public static bool KeywordExists (string word)
+            {
+                if (word is null || word == string.Empty) { throw new ArgumentException(); }
+                bool exists;
+                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+                {
+                    databaseConnection.ConnectionString = connectionString;
+                    databaseConnection.Open();
+                    var databaseQuery = databaseConnection.CreateCommand();
+                    databaseQuery.CommandText = $"SELECT Word, FROM Keywords_Logs, WHERE Word = '{word}'";
+                    var filteredDatabaseReader = databaseQuery.ExecuteReader();
+                    if (filteredDatabaseReader.HasRows) { exists = true; }
+                    else { exists = false; }
+                }
+                return exists;
+            }
         }      
     }
 }
