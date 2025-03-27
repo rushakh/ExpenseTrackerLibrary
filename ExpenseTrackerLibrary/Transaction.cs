@@ -92,7 +92,7 @@ namespace ExpenseTrackerLibrary
         /// <summary>
         /// Constructor that should be used to construct a new object of type Transaction.
         /// </summary>
-        /// <param name="date"></param>
+        /// <param name="dateAndTime"></param>
         /// <param name="amount"></param>
         /// <param name="type"></param>
         /// <param name="isImportant"></param>
@@ -137,7 +137,7 @@ namespace ExpenseTrackerLibrary
         /// Constructor that should be used for loading a Transaction from the database.
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="date"></param>
+        /// <param name="dateAndTime"></param>
         /// <param name="amount"></param>
         /// <param name="type"></param>
         /// <param name="isImportant"></param>
