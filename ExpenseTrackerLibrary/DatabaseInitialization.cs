@@ -180,7 +180,7 @@ namespace ExpenseTrackerLibrary
         /// <param name="note"></param>
         private static void CreateCategoryIfNotExists(Globals.CategoryTypes categoryType, string title, bool isdefault, string? note)
         {
-            bool exists = DatabaseManager.DatabaseReader.CategoryExists(title);
+            bool exists = Globals.Database.Reader.CategoryExists(title);
             if (!exists)
             {
                 Category defaultCategory = new Category(categoryType, title, isdefault, note);
@@ -204,10 +204,10 @@ namespace ExpenseTrackerLibrary
         /// <param name="word"></param>
         private static void CreateKeywordsIfNotExists(string word)
         {
-            bool exists = DatabaseManager.DatabaseReader.KeywordExists(word);
+            bool exists = Globals.Database.Reader.KeywordExists(word);
             if (!exists)
             {
-                DatabaseManager.DatabaseWriter.AddKeyword(word);
+                Globals.Database.Writer.AddKeyword(word);
             }
         }
     }

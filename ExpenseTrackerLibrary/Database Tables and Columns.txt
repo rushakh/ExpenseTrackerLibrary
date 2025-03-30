@@ -1,6 +1,6 @@
 ﻿* Id is Auto Inc Primary Key in all of them --> Therefore it's the same as RowId.
 
-* Transaction Table Columns:
+* Transaction Table Columns (Transaction_Logs):
 	Id INTEGER,
 	DateTime TEXT,
 	Amount DECIMAL,
@@ -12,14 +12,14 @@
 	Note TEXT,
 	ImagePath TEXT
 
-* Category Table Comuns:
+* Category Table Comuns (Category_Logs):
 	Id INTEGER,
 	CategoryType INTEGER,
 	Title TEXT,
 	IsDefault BOOL,
 	Note TEXT
 
-* Accounts Table Columns:
+* Accounts Table Columns (Accounts_Logs):
 	Id INTEGER,
 	BeginningDate TEXT,
 	EndDate TEXT,
@@ -28,6 +28,6 @@
 	OwedSum DECIMAL,
 	EarningSum DECIMAL
 
-* Keywords Table Columns:
+* Keywords Table Columns (Keywords_Logs):
 	Id INTEGER,
 	Word TEXT

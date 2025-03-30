@@ -19,14 +19,15 @@ namespace ExpenseTrackerLibrary
 
         // LATER should also add IMAGE AND COLOR Attributes Or maybe that should be done somewhere else.
 
+        /// <inheritdoc/>
         public int Id { get => _id; }
-
+        /// <inheritdoc/>
         public Globals.CategoryTypes CategoryType { get => _categoryType; set => _categoryType = value;}
-
+        /// <inheritdoc/>
         public string Title { get => _title; set => _title = value; }
-
+        /// <inheritdoc/>
         public bool isDefaultCategory { get => _isDefaultCategory; }
-
+        /// <inheritdoc/>
         public string? Note { get => _note; set => _note = value; }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace ExpenseTrackerLibrary
             _title = title;
             _note = note;
             _isDefaultCategory = isDefault;
-            _id = DatabaseManager.DatabaseWriter.AddCategory(_categoryType, _title, _isDefaultCategory, _note);
+            _id = Globals.Database.Writer.AddCategory(_categoryType, _title, _isDefaultCategory, _note);
         }
 
         /// <summary>
@@ -53,18 +54,19 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="isDefault"></param>
         /// <param name="note"></param>
-        public Category (int id, int categoryType, string title, bool isDefault, string? note)
+        internal Category (int id, int categoryType, string title, bool isDefault, string? note)
         {
             _id = id;
             _categoryType = (Globals.CategoryTypes)categoryType;
             _title = title;
             _isDefaultCategory = isDefault;
             _note = note;
-        }       
+        }
 
+        /// <inheritdoc/>
         public Transaction[]? GetTransactions ()
         {
-            var categoryTransactions = DatabaseManager.DatabaseReader.GetTransactions(this);
+            var categoryTransactions = Globals.Database.Reader.GetTransactions(this);
             return categoryTransactions;
         }
     }

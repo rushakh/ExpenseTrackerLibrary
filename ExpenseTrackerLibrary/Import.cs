@@ -171,7 +171,7 @@ namespace ExpenseTrackerLibrary
                 var regxObj = new Regex(regPattern);
                 var result = regxObj.Match(amountText);
                 amountString = result.Value;
-                amount = decimal.Parse (result.Value);
+                amount = decimal.Parse (result.Value);                
             }
             else if (decimal.TryParse(amountText, out amount))
             {

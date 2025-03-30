@@ -24,16 +24,17 @@ namespace ExpenseTrackerLibrary
         private string? _note;
         private string? _imagePath;
 
+        /// <inheritdoc/>
         public int Id { get => _id; }
-
+        /// <inheritdoc/>
         public DateTime Date { get => _dateTime; set => _dateTime = value; }
-
+        /// <inheritdoc/>
         public decimal Amount { get => _amount; set => _amount = value; }
-
+        /// <inheritdoc/>
         public Globals.TransactionTypes TransactionType { get => _transactionType; set => _transactionType = value; }
-
+        /// <inheritdoc/>
         public bool IsImportant { get => _isImportant; set => _isImportant = value; }
-
+        /// <inheritdoc/>
         public string[]? Keywords 
         {
             get 
@@ -49,11 +50,11 @@ namespace ExpenseTrackerLibrary
                 }
             } 
         }
-
+        /// <inheritdoc/>
         public Category Category { get => _category; set => _category = value; }
-
+        /// <inheritdoc/>
         public string? Title { get => _title; set => _title = value; }
-
+        /// <inheritdoc/>
         public string? Note 
         {
             get 
@@ -69,11 +70,11 @@ namespace ExpenseTrackerLibrary
                 }
             } 
         }
-
+        /// <inheritdoc/>
         public string? ImagePath { get => _imagePath; set => _imagePath = value; }
-
-        public bool HasKeywords { get => _hasKeywords; }     
-
+        /// <inheritdoc/>
+        public bool HasKeywords { get => _hasKeywords; }
+        /// <inheritdoc/>
         public bool HasNote
         {
             get
@@ -130,7 +131,7 @@ namespace ExpenseTrackerLibrary
             }
             _imagePath = imagePath;
             // Should add the Transaction's data to the database, and get the Id now.
-            _id = DatabaseManager.DatabaseWriter.AddTransaction(_dateTime, _amount, _transactionType, _isImportant, _keywords, _category, _title, _note, _imagePath);
+            _id = Globals.Database.Writer.AddTransaction(_dateTime, _amount, _transactionType, _isImportant, _keywords, _category, _title, _note, _imagePath);
         }
 
         /// <summary>
@@ -146,7 +147,7 @@ namespace ExpenseTrackerLibrary
         /// <param name="title"></param>
         /// <param name="note"></param>
         /// <param name="imagePath"></param>
-        public Transaction (int id, DateTime dateAndTime, decimal amount, Globals.TransactionTypes type,  bool isImportant, string[]? keywords, Category category, string? title,  string? note, string? imagePath)
+        internal Transaction (int id, DateTime dateAndTime, decimal amount, Globals.TransactionTypes type,  bool isImportant, string[]? keywords, Category category, string? title,  string? note, string? imagePath)
         {
             _id = id;
             _transactionType = type;

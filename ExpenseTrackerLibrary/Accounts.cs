@@ -18,15 +18,22 @@ namespace ExpenseTrackerLibrary
         private decimal _owedSum;
         private decimal _earningSum;
 
+        /// <inheritdoc/>
         public int Id { get => _id; }
+        /// <inheritdoc/>
         public DateTime Beginning { get => _beginning; }
+        /// <inheritdoc/>
         public DateTime End { get => _end; }
-        public Transaction[]? Transactions { get => _transactions; }       
+        /// <inheritdoc/>
+        public Transaction[]? Transactions { get => _transactions; }
+        /// <inheritdoc/>
         public decimal ExpenseSum { get => _expenseSum; }
+        /// <inheritdoc/>
         public decimal DebtSum { get => _debtSum; }
+        /// <inheritdoc/>
         public decimal OwedSum { get => _owedSum; }
+        /// <inheritdoc/>
         public decimal EarningSum { get => _earningSum; }
-
         /// <summary>
         /// Constructor for creating an object of type Accounts that contains the financial accounts
         /// of a specified period of time.
@@ -34,36 +41,13 @@ namespace ExpenseTrackerLibrary
         /// <param name="beginning"></param>
         /// <param name="end"></param>
         public Accounts (DateTime beginning, DateTime end)
-        {
+        {            
             _beginning = beginning;
             _end = end;
-            _transactions = DatabaseManager.DatabaseReader.GetTransactions(beginning, end);
+            _transactions = Globals.Database.Reader.GetTransactions(beginning, end);
             CalculateAccounts();
-            _id = DatabaseManager.DatabaseWriter.AddAccount(_beginning, _end, _expenseSum, _debtSum, _owedSum, _earningSum);
-        }
-
-        /// <summary>
-        /// Constructor for loading an object of type Accounts that contains the financial accounts 
-        /// of a specified period of time from the database. 
-        /// </summary>
-        /// <param name="accountsId"></param>
-        /// <param name="beginning"></param>
-        /// <param name="end"></param>
-        public Accounts (int accountsId, DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
-        {
-            // Can either get it from the database, or retrieve it again to calculate the sums.
-            // But either way, will have to retrieve the transactions --> *** Might change this design
-            // GetAccounts (beginning, end);
-            _id = accountsId;
-            _beginning = beginning;
-            _end = end;
-            _expenseSum = expensesSum;
-            _debtSum = debtSum;
-            _owedSum = owedSum;
-            _earningSum = earningSum;
-            _transactions = DatabaseManager.DatabaseReader.GetTransactions(beginning, end);
-        }
-
+            _id = Globals.Database.Writer.AddAccount(_beginning, _end, _expenseSum, _debtSum, _owedSum, _earningSum);
+        }        
         /// <summary>
         /// Constructor for creating an object of type Accounts using a provided array of transactions.
         /// </summary>
@@ -76,7 +60,28 @@ namespace ExpenseTrackerLibrary
             _transactions = orderTransactions.ToArray();
             CalculateAccounts();
         }
-
+        /// <summary>
+        /// Constructor for loading an object of type Accounts that contains the financial accounts 
+        /// of a specified period of time from the database. 
+        /// </summary>
+        /// <param name="accountsId"></param>
+        /// <param name="beginning"></param>
+        /// <param name="end"></param>
+        internal Accounts(int accountsId, DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
+        {
+            // Can either get it from the database, or retrieve it again to calculate the sums.
+            // But either way, will have to retrieve the transactions --> *** Might change this design
+            // GetAccounts (beginning, end);
+            _id = accountsId;
+            _beginning = beginning;
+            _end = end;
+            _expenseSum = expensesSum;
+            _debtSum = debtSum;
+            _owedSum = owedSum;
+            _earningSum = earningSum;
+            _transactions = Globals.Database.Reader.GetTransactions(beginning, end);
+        }
+        /// <inheritdoc/>
         public Transaction[]? Expenses ()
         {
             var tempExpenses = from transaction in _transactions
@@ -92,7 +97,7 @@ namespace ExpenseTrackerLibrary
                 return expenses;
             }
         }
-
+        /// <inheritdoc/>
         public Transaction[]? Debts ()
         {
             var tempDebts = from transaction in _transactions
@@ -108,7 +113,7 @@ namespace ExpenseTrackerLibrary
                 return debts;
             }
         }
-
+        /// <inheritdoc/>
         public Transaction[]? Oweds ()
         {
             var tempOweds = from transaction in _transactions
@@ -124,7 +129,7 @@ namespace ExpenseTrackerLibrary
                 return oweds;
             }
         }
-
+        /// <inheritdoc/>
         public Transaction[]? Earnings ()
         {
             var tempEarnings = from transaction in _transactions

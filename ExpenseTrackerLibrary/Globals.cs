@@ -54,5 +54,10 @@ namespace ExpenseTrackerLibrary
         /// The default keywords.
         /// </summary>
         public static readonly string[] defaultKeywords = { "Daily", "Weekly", "Monthly", "Yearly" };
+
+        /// <summary>
+        /// The gateway to using DatabaseManager from various places of the program.
+        /// </summary>
+        public static DatabaseManager Database = DatabaseManager.Instance;
     }
 }
