@@ -4,4 +4,10 @@ The goal is supposed to be simplicity, reliability, and flexibility (without the
 
 It should also ideally contain a configurable import system (format) to be able to add previously recorded expenses (e.g., from a text file).
 
-Work in progress.
+It is mostly done and I'll at most add some methods to make queries easier or to make minor changes.
+
+I've also added unit tests.
+
+The only thing left is to use this Library in the actual program. 
+
+Let me know what you think of it.
