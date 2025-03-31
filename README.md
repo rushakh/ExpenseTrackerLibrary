@@ -1,4 +1,4 @@
-A Program for helping the user keep track of my expenses, earnings, etc. with simple categorization, debt and credit tracking, and accounting.
+A Library for a Finance Tracking Program for helping the user keep track of my expenses, earnings, etc. with simple categorization, debt and credit tracking, and accounting.
 
 The goal is supposed to be simplicity, reliability, and flexibility (without the hassle and overcomplications of most money manager and expense tracker apps out there).
 
