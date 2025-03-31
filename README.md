@@ -4,6 +4,8 @@ The goal is supposed to be simplicity, reliability, and flexibility (without the
 
 It should also ideally contain a configurable import system (format) to be able to add previously recorded expenses (e.g., from a text file).
 
+It is made with .NET 9 and Microsoft SQLite package.
+
 It is mostly done and I'll at most add some methods to make queries easier or to make minor changes.
 
 I've also added unit tests.
