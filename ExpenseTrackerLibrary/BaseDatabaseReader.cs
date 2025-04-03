@@ -152,6 +152,35 @@ namespace ExpenseTrackerLibrary
         }
 
         /// <summary>
+        /// Finds and returns a category using its Title (exact). Returns null if
+        /// a category with that Title is not found.
+        /// </summary>
+        /// <param name="categoryTitle"></param>
+        /// <returns></returns>
+        public Category? GetCategory (string categoryTitle)
+        {
+            Category foundCategory;
+            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+            {
+                databaseConnection.ConnectionString = connectionString;
+                databaseConnection.Open();
+                var databaseQuery = databaseConnection.CreateCommand();
+                databaseQuery.CommandText = $"SELECT * FROM Category_Logs" +
+                    $" WHERE Title = '{categoryTitle}'";
+                var filteredDatabaseReader = databaseQuery.ExecuteReader();
+                if (filteredDatabaseReader.HasRows)
+                {
+                    foundCategory = ConvertSQLiteReader.ToCategory(filteredDatabaseReader);
+                    return foundCategory;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }        
+
+        /// <summary>
         /// Finds, loads, and returns the transaction with the specified transaction Id. Throws an
         /// exception if it doesn't exist.
         /// </summary>

@@ -105,6 +105,37 @@ namespace ExpenseTrackerLibrary.Tests
         }
 
         [TestMethod()]
+        public void GetCategoryTest2()
+        {
+            // Finds and returns category using its Title
+            DatabaseManager dbManager = DatabaseManager.Instance;
+            DatabaseInitialization.DatabaseInit();
+            dbManager.Writer.DeleteAllCategories();
+            // No category should exist at this point.
+            Assert.IsNull(dbManager.Reader.GetAllCategories());
+
+            string testTitle = "Test Category";
+            string testNote = "This is a Test";
+            string testTitle2 = "Test";
+            Category testCategory = new Category(Globals.CategoryTypes.MainCategory, testTitle, false, testNote);
+            Category testCategory2 = new Category(Globals.CategoryTypes.MainCategory, testTitle2, false, null);
+            // Now we call the method
+            Category? foundCategory = dbManager.Reader.GetCategory(testTitle);
+            Assert.IsNotNull(foundCategory);
+            Assert.AreEqual (testCategory.Title, foundCategory.Title);
+            Assert.AreEqual (testCategory.Note, foundCategory.Note);
+            // The Search should be Case Sensitive.
+            string testUpperTitle = testTitle.ToUpper();
+            string testLowerTitle = testTitle.ToLower();
+            Category? foundCategoryUpper = dbManager.Reader.GetCategory(testUpperTitle);
+            Category? foundCategoryLower = dbManager.Reader.GetCategory (testLowerTitle);
+            Assert.IsNull (foundCategoryUpper);
+            Assert.IsNull (foundCategoryLower);
+            // We can now delete them all
+            dbManager.Writer.DeleteAllCategories();
+        }
+
+        [TestMethod()]
         public void GetTransactionTest()
         {
             DatabaseManager dbManager = DatabaseManager.Instance;

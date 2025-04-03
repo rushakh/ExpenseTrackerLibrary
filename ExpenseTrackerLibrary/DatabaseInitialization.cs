@@ -13,7 +13,8 @@ namespace ExpenseTrackerLibrary
     /// </summary>
     public static class DatabaseInitialization
     {
-        private static readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
+        //private static readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
+        private static readonly string connectionString = $"Data Source={Globals.applicationPath}\\Expense_Logs.sqlite";
         private static readonly string databaseName = "Expense_Logs.sqlite";
 
         /// <summary>

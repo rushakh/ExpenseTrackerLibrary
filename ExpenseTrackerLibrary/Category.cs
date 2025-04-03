@@ -40,6 +40,10 @@ namespace ExpenseTrackerLibrary
         public Category(Globals.CategoryTypes categoryType, string title, bool isDefault, string? note)
         {
             _categoryType = categoryType;
+            if (!FormatAndFilter.IsCategoryAllowed(title))
+            {
+                throw new ArgumentException("The title contains invalid elements.");
+            }
             _title = title;
             _note = note;
             _isDefaultCategory = isDefault;

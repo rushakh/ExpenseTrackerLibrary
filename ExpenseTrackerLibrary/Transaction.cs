@@ -108,17 +108,47 @@ namespace ExpenseTrackerLibrary
             _dateTime = dateAndTime;
             _amount = amount;
             _isImportant = isImportant;
-            // Keywords should preferably be checked to be in the correct format before being used here.
-            _keywords = keywords;
-            if (_keywords is not null && _keywords.Length > 0)
+            // Keywords should be checked
+            if (keywords != null)
             {
-                _hasKeywords = true;
+                if (FormatAndFilter.AreKeywordsAllowed(keywords))
+                {
+                    _keywords = keywords;
+                    if (_keywords is not null && _keywords.Length > 0)
+                    {
+                        _hasKeywords = true;
+                    }
+                    else
+                    {
+                        _hasKeywords = false;
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("keywords[] is either Null or contains at least one invalid elements");
+                }
             }
             else
             {
+                _keywords = null;
                 _hasKeywords = false;
             }
-            _title = title;
+            // Title should be checked
+            if (title != null)
+            {
+                if (FormatAndFilter.IsTransactionTitleAllowed(title))
+                {
+                    _title = title;
+                }
+                else
+                {
+                    throw new ArgumentException("title string contains at least one invalid element.");
+                }
+            }
+            else
+            {
+                _title = title;
+            }
             _category = category;
             _note = note;
             if (_note is not null && _note != string.Empty)
