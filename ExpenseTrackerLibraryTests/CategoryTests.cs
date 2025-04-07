@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Testing.Platform.Extensions.Messages;
 
 namespace ExpenseTrackerLibrary.Tests
 {
@@ -68,6 +69,63 @@ namespace ExpenseTrackerLibrary.Tests
             // Now that we're done, we can delete them all.
             dbManager.Writer.DeleteAllCategories();
             dbManager.Writer.DeleteAllTransactions();
+        }
+
+        [TestMethod()]
+        public void UpdateTest()
+        {
+            DatabaseManager dbManager = DatabaseManager.Instance;
+            DatabaseInitialization.DatabaseInit();
+            dbManager.Writer.DeleteAllCategories();
+
+            string testTitle1 = "Unit Test 1";
+            string testTitle2 = "Unit Test 2";
+            Globals.CategoryTypes testCategoryType1 = Globals.CategoryTypes.MainCategory;
+            Globals.CategoryTypes testCategoryType2 = Globals.CategoryTypes.SubCategory;
+            string testNote1 = "This is test 1 of 2.";
+            string testNote2 = "This is test 2 of 2.";
+            Category testCategory1 = new Category(testCategoryType1, testTitle1, false, testNote1);
+            
+            Assert.IsNotNull(testCategory1);
+            // We will now make changes, call the method, and then get the category from the database.
+            testCategory1.Title = testTitle2;
+            testCategory1.Note = testNote2;
+            testCategory1.CategoryType = testCategoryType2;
+            testCategory1.Update();
+            Category updatedTestCategory1 = dbManager.Reader.GetCategory(testCategory1.Id);
+            // We can change other things as well but no need for that now.
+            Assert.IsNotNull(updatedTestCategory1);
+            Assert.AreEqual<string>(testTitle2, updatedTestCategory1.Title);
+            Assert.AreEqual<string>(testNote2, updatedTestCategory1.Note);
+            Assert.AreEqual(testCategoryType2, updatedTestCategory1.CategoryType);
+            // We can now delete everything
+            dbManager.Writer.DeleteAllTransactions();
+            dbManager.Writer.DeleteAllCategories();
+        }
+
+        [TestMethod()]
+        public void RemoveTest()
+        {
+            DatabaseManager dbManager = DatabaseManager.Instance;
+            DatabaseInitialization.DatabaseInit();
+            dbManager.Writer.DeleteAllCategories();
+            // There should be no categories now.
+            Category[]? foundCategories = dbManager.Reader.GetAllCategories();
+            Assert.IsNull(foundCategories);
+            // now we add two categories, then remove one and check.
+            Category testCategory1 = new Category(Globals.CategoryTypes.MainCategory, "Unit Test 1", true, "This is test category 1 of 2.");
+            Category testCategory2 = new Category(Globals.CategoryTypes.SubCategory, "Unit Test 2", true, "This is test category 1 of 2.");
+            foundCategories = dbManager.Reader.GetAllCategories();
+            Assert.IsNotNull(foundCategories);
+            Assert.IsTrue(foundCategories.Length == 2);
+            testCategory1.Remove();
+            foundCategories = dbManager.Reader.GetAllCategories();
+            Assert.IsTrue(foundCategories.Length == 1);
+            Assert.AreEqual(testCategory2.CategoryType, foundCategories[0].CategoryType);
+            Assert.AreEqual<string>(testCategory2.Title, foundCategories[0].Title);
+            Assert.AreEqual<string>(testCategory2.Note, foundCategories[0].Note);
+            // We can delete everything now.
+            dbManager.Writer.DeleteAllCategories();
         }
     }
 }

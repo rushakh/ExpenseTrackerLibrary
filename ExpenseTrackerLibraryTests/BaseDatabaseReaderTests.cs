@@ -30,7 +30,10 @@ namespace ExpenseTrackerLibrary.Tests
         public void GetAllTransactionsTest()
         {
             DatabaseManager dbManager = DatabaseManager.Instance;
-            // It should return Null at first as there are no transaction in it
+            DatabaseInitialization.DatabaseInit();
+            dbManager.Writer.DeleteAllTransactions();
+            dbManager.Writer.DeleteAllCategories();
+            // It should return Null now
             Transaction[]? testAllTransactions = dbManager.Reader.GetAllTransactions();
             Assert.IsNull(testAllTransactions);
             Category testCategory1 = new Category(Globals.CategoryTypes.MainCategory, "Test Category 1", false, null);

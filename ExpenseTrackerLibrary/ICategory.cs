@@ -35,5 +35,17 @@ namespace ExpenseTrackerLibrary
         /// The transactions that are in this category. Returns null if nothing is found.
         /// </summary>
         Transaction[]? GetTransactions();
+        /// <summary>
+        /// Updates the database entry of this Category. Returns true if successful 
+        /// and false if no or more than one row was affected.
+        /// </summary>
+        /// <returns></returns>
+        bool Update();
+        /// <summary>
+        /// Removes this Category from the database. Returns true if successful 
+        /// and false if no or more than one row was affected.
+        /// </summary>
+        /// <returns></returns>
+        bool Remove();
     }
 }

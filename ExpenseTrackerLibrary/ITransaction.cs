@@ -72,6 +72,19 @@ namespace ExpenseTrackerLibrary
         /// otherwise, there is no note and Note property is null.
         /// </summary>
         bool HasNote { get; }
-        
+
+        /// <summary>
+        /// Updates the database entry of this transaction.Returns true if successful 
+        /// and false if no or more than one row was affected.
+        /// </summary>
+        /// <returns></returns>
+        bool Update();
+
+        /// <summary>
+        /// Removes this transaction from the database. Returns true if successful 
+        /// and false if no or more than one row was affected.
+        /// </summary>
+        /// <returns></returns>
+        bool Remove();
     }
 }

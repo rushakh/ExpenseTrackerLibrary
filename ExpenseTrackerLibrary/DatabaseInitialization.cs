@@ -14,8 +14,9 @@ namespace ExpenseTrackerLibrary
     public static class DatabaseInitialization
     {
         //private static readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
-        private static readonly string connectionString = $"Data Source={Globals.applicationPath}\\Expense_Logs.sqlite";
-        private static readonly string databaseName = "Expense_Logs.sqlite";
+        //private static readonly string connectionString = $"Data Source={Globals.applicationPath}\\Expense_Logs.sqlite";
+        private static readonly string connectionString = Globals.connectionString;
+        private static readonly string databasePath = Globals.applicationPath + "\\Expense_Logs.sqlite";
 
         /// <summary>
         /// Contains the methods for the creation of the database tables.
@@ -42,12 +43,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             private static void TransactionTableInit()
             {
-                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-                {
-                    databaseConnection.ConnectionString = connectionString;
-                    databaseConnection.Open();
-                    var transactionTable = databaseConnection.CreateCommand();
-                    transactionTable.CommandText =
+                string commandText =
                         @"CREATE TABLE IF NOT EXISTS Transaction_Logs(
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 DateTime TEXT,
@@ -60,9 +56,7 @@ namespace ExpenseTrackerLibrary
                 Note TEXT,
                 ImagePath TEXT
                 )";
-                    transactionTable.ExecuteNonQuery();
-                    databaseConnection.Close();
-                }
+                ExecuteNonQueryCommand(commandText);
             }
 
             /// <summary>
@@ -71,12 +65,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             private static void CategoryTableInit()
             {
-                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-                {
-                    databaseConnection.ConnectionString = connectionString;
-                    databaseConnection.Open();
-                    var categoryTable = databaseConnection.CreateCommand();
-                    categoryTable.CommandText =
+                string commandText =
                         @"CREATE TABLE IF NOT EXISTS Category_Logs(
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 CategoryType INTEGER,
@@ -84,9 +73,7 @@ namespace ExpenseTrackerLibrary
                 IsDefault BOOL,
                 Note TEXT
                 )";
-                    categoryTable.ExecuteNonQuery();
-                    databaseConnection.Close();
-                }
+                ExecuteNonQueryCommand(commandText);
             }
 
             /// <summary>
@@ -95,13 +82,7 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             private static void AccountsTableInit()
             {
-                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-                {
-                    databaseConnection.ConnectionString = connectionString;
-                    databaseConnection.Open();
-                    var accountsTable = databaseConnection.CreateCommand();
-                    accountsTable.CommandText =
-                        @"CREATE TABLE IF NOT EXISTS Accounts_Logs(
+                string commandText = @"CREATE TABLE IF NOT EXISTS Accounts_Logs(
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 BeginningDate TEXT,
                 EndDate TEXT,
@@ -110,9 +91,7 @@ namespace ExpenseTrackerLibrary
                 OwedSum DECIMAL,
                 EarningSum DECIMAL
                 )";
-                    accountsTable.ExecuteNonQuery();
-                    databaseConnection.Close();
-                }
+                ExecuteNonQueryCommand(commandText);
             }
 
             /// <summary>
@@ -121,26 +100,38 @@ namespace ExpenseTrackerLibrary
             /// </summary>
             private static void KeywordsTableInit()
             {
-                using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-                {
-                    databaseConnection.ConnectionString = connectionString;
-                    databaseConnection.Open();
-                    var keywordsTable = databaseConnection.CreateCommand();
-                    keywordsTable.CommandText =
+                string commandText =
                         @"CREATE TABLE IF NOT EXISTS Keywords_Logs(
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Word TEXT
                 )";
-                    keywordsTable.ExecuteNonQuery();
-                    databaseConnection.Close();
+                ExecuteNonQueryCommand(commandText);
+            }
+
+            /// <summary>
+            /// Executes the Non-Query command against the database and returns the number
+            /// of affected rows.
+            /// </summary>
+            /// <param name="cmndText"></param>
+            /// <returns></returns>
+            private static int ExecuteNonQueryCommand(string cmndText)
+            {
+                int affectedRows;
+                using (SqliteConnection databaseConnection = new SqliteConnection(connectionString))
+                {
+                    databaseConnection.Open();
+                    var databaseCommand = databaseConnection.CreateCommand();
+                    databaseCommand.CommandText = cmndText;
+                    affectedRows = databaseCommand.ExecuteNonQuery();
                 }
-            }           
+                return affectedRows;
+            }
         }
 
         /// <summary>
         /// Initializes the database and the tables required for the application to function.
         /// </summary>
-        public static void DatabaseInit ()
+        public static void DatabaseInit()
         {
             // I didn't want the database creation to be bound to the creation of the tables
             // so I just put this here, so an empty database is created before going for the tables.
@@ -153,6 +144,15 @@ namespace ExpenseTrackerLibrary
             DatabaseTables.TablesInit();
             CreateDefaultCategories();
             CreateDefaultKeywords();
+        }
+
+        /// <summary>
+        /// Deletes the database file, recreates it with only the default tables and elements.
+        /// </summary>
+        public static void ReInitializeDatabase()
+        {
+            System.IO.File.Delete(databasePath);
+            DatabaseInit();
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace ExpenseTrackerLibrary
         /// </summary>
         private static void CreateDefaultKeywords()
         {
-            foreach(string keyword in Globals.defaultKeywords)
+            foreach (string keyword in Globals.defaultKeywords)
             {
                 CreateKeywordsIfNotExists(keyword);
             }

@@ -31,7 +31,7 @@ namespace ExpenseTrackerLibrary
         /// <summary>
         /// The location of the application's .exe file
         /// </summary>
-        public static readonly string applicationPath = System.IO.Directory.GetCurrentDirectory();
+        public static readonly string applicationPath =System.IO.Path.GetDirectoryName( System.Reflection.Assembly.GetExecutingAssembly().Location);
         /// <summary>
         /// The culture info in use for the program.
         /// </summary>
@@ -54,6 +54,8 @@ namespace ExpenseTrackerLibrary
         /// The default keywords.
         /// </summary>
         public static readonly string[] defaultKeywords = { "Daily", "Weekly", "Monthly", "Yearly" };
+
+        public static readonly string connectionString = $"Data Source={applicationPath}\\Expense_Logs.sqlite";
 
         /// <summary>
         /// The gateway to using DatabaseManager from various places of the program.

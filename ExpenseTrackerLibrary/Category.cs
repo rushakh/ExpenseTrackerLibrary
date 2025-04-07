@@ -42,7 +42,7 @@ namespace ExpenseTrackerLibrary
             _categoryType = categoryType;
             if (!FormatAndFilter.IsCategoryAllowed(title))
             {
-                throw new ArgumentException("The title contains invalid elements.");
+                throw new ArgumentException("The Category either exists or the title contains invalid elements.");
             }
             _title = title;
             _note = note;
@@ -72,6 +72,34 @@ namespace ExpenseTrackerLibrary
         {
             var categoryTransactions = Globals.Database.Reader.GetTransactions(this);
             return categoryTransactions;
+        }
+
+        /// <inheritdoc/>
+        public bool Update ()
+        {
+            int affectedRows = Globals.Database.Writer.UpdateCategory(this);
+            if (affectedRows == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Remove ()
+        {
+            int affectedRows = Globals.Database.Writer.DeleteCategory(Id);
+            if (affectedRows == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

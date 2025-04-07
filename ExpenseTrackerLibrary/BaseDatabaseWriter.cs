@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,9 @@ namespace ExpenseTrackerLibrary
     /// </summary>
     public abstract class BaseDatabaseWriter
     {
-        private readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
+        //private readonly string connectionString = @"Data Source=Expense_Logs.sqlite";
+        private readonly string connectionString = Globals.connectionString;
+        //private readonly string connectionString = @"Expense_Logs.sqlite";
 
         /// <summary>
         /// Constructor
@@ -50,18 +53,11 @@ namespace ExpenseTrackerLibrary
             if (imagePath is not null) { theImagePath = imagePath; }
             else { theImagePath = string.Empty; }
 
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"INSERT INTO Transaction_Logs(DateTime, Amount, TransactionType, IsImportant, Keywords, Category, Title, Note, ImagePath) " +
-                    $" VALUES ('{dateAndTime.ToString()}', '{amount}', '{(int)type}', '{isImportant}', '{joinedKeywords}', '{category.Id}', '{theTitle}', '{theNote}', '{theImagePath}') " +
-                    $" RETURNING RowId;";
-                transactionId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"INSERT INTO Transaction_Logs(DateTime, Amount, TransactionType, IsImportant, Keywords, Category, Title, Note, ImagePath) " +
+                $" VALUES ('{dateAndTime.ToString(Globals.cultureInfo)}', '{amount}', '{(int)type}', '{isImportant}', '{joinedKeywords}', '{category.Id}', '{theTitle}', '{theNote}', '{theImagePath}') " +
+                $" RETURNING RowId;";
+            transactionId = ExecuteScalarRowId(commandText);
             return transactionId;
         }
 
@@ -81,17 +77,11 @@ namespace ExpenseTrackerLibrary
             if (note is not null) { checkedNote = note; }
             else { checkedNote = string.Empty; }
 
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"INSERT INTO Category_Logs(CategoryType, Title, IsDefault, Note)" +
-                    $" VALUES ('{(int)categoryType}', '{title}', '{isDefault}', '{checkedNote}')" +
-                    $" RETURNING RowId";
-                categoryId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
-            }
+            string commandText =
+                $"INSERT INTO Category_Logs(CategoryType, Title, IsDefault, Note)" +
+                $" VALUES ('{(int)categoryType}', '{title}', '{isDefault}', '{checkedNote}')" +
+                $" RETURNING RowId";
+            categoryId = ExecuteScalarRowId(commandText);
             return categoryId;
         }
 
@@ -109,17 +99,11 @@ namespace ExpenseTrackerLibrary
         public int AddAccount(DateTime beginning, DateTime end, decimal expensesSum, decimal debtSum, decimal owedSum, decimal earningSum)
         {
             int accountsId;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"INSERT INTO Accounts_Logs(BeginningDate, EndDate, ExpensesSum, DebtSum, OwedSum, EarningSum)" +
-                    $" VALUES ('{beginning.ToString()}', '{end.ToString()}', '{expensesSum}', '{debtSum}', '{owedSum}', '{earningSum}')" +
-                    $" RETURNING RowId";
-                accountsId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
-            }
+            string commandText =
+                $"INSERT INTO Accounts_Logs(BeginningDate, EndDate, ExpensesSum, DebtSum, OwedSum, EarningSum)" +
+                $" VALUES ('{beginning.ToString()}', '{end.ToString()}', '{expensesSum}', '{debtSum}', '{owedSum}', '{earningSum}')" +
+                $" RETURNING RowId";
+            accountsId = ExecuteScalarRowId(commandText);
             return accountsId;
         }
 
@@ -135,17 +119,12 @@ namespace ExpenseTrackerLibrary
             string checkedKeyword;
             if (keyword is not null) { checkedKeyword = keyword; }
             else { checkedKeyword = string.Empty; }
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"INSERT INTO Keywords_Logs(Word)" +
-                    $" VALUES ('{checkedKeyword}')" +
-                    $" RETURNING RowId";
-                keywordId = Convert.ToInt32(sqliteCommand.ExecuteScalar());
-            }
+
+            string commandText =
+                $"INSERT INTO Keywords_Logs(Word)" +
+                $" VALUES ('{checkedKeyword}')" +
+                $" RETURNING RowId";
+            keywordId = ExecuteScalarRowId(commandText);
             return keywordId;
         }
 
@@ -175,18 +154,11 @@ namespace ExpenseTrackerLibrary
             if (editedTransaction.ImagePath is not null) { theImagePath = editedTransaction.ImagePath; }
             else { theImagePath = string.Empty; }
 
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"UPDATE Transaction_Logs" +
-                    $" SET DateTime = '{theDateTime}', Amount = '{amount}', TransactionType = '{type}', IsImportant = '{isImportant}', Keywords = '{checkedKeywords}', Category = '{categoryId}', Title = '{theTitle}', Note = '{theNote}', ImagePath = '{theImagePath}')" +
-                    $" WHERE Id = '{editedTransaction.Id}';";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"UPDATE Transaction_Logs" +
+                $" SET DateTime = '{theDateTime}', Amount = '{amount}', TransactionType = '{type}', IsImportant = '{isImportant}', Keywords = '{checkedKeywords}', Category = '{categoryId}', Title = '{theTitle}', Note = '{theNote}', ImagePath = '{theImagePath}'" +
+                $" WHERE Id = '{editedTransaction.Id}';";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -208,18 +180,11 @@ namespace ExpenseTrackerLibrary
             if (editedCategory.Note is not null) { note = editedCategory.Note; }
             else { note = string.Empty; }
 
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"UPDATE Category_Logs" +
-                    $" SET CategoryType = '{categoryId}', Title = '{title}', IsDefault = '{isDefault}', Note = '{note}'" +
-                    $" WHERE Id = '{editedCategory.Id}';";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"UPDATE Category_Logs" +
+                $" SET CategoryType = '{type}', Title = '{title}', IsDefault = '{isDefault}', Note = '{note}'" +
+                $" WHERE Id = '{editedCategory.Id}';";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -241,18 +206,11 @@ namespace ExpenseTrackerLibrary
             decimal owed = editedAccounts.OwedSum;
             decimal earning = editedAccounts.EarningSum;
 
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"UPDATE Accounts_Logs" +
-                    $" SET BeginningDate = '{beginDate}', EndDate = '{endDate}', ExpensesSum = '{expense}', DebtSum = '{debt}', OwedSum = '{owed}', EarningSum = '{earning}'" +
-                    $" WHERE Id = '{editedAccounts.Id}';";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"UPDATE Accounts_Logs" +
+                $" SET BeginningDate = '{beginDate}', EndDate = '{endDate}', ExpensesSum = '{expense}', DebtSum = '{debt}', OwedSum = '{owed}', EarningSum = '{earning}'" +
+                $" WHERE Id = '{editedAccounts.Id}';";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -266,18 +224,11 @@ namespace ExpenseTrackerLibrary
         public int UpdateKeyword(string keyword, string editedKeyword)
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"UPDATE Keywords_Logs" +
-                    $" SET Word = '{editedKeyword}'" +
-                    $" WHERE Word = '{keyword}';";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"UPDATE Keywords_Logs" +
+                $" SET Word = '{editedKeyword}'" +
+                $" WHERE Word = '{keyword}';";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -286,19 +237,12 @@ namespace ExpenseTrackerLibrary
         /// were affected (To be used mostly for Unit tests).
         /// </summary>
         /// <returns></returns>
-        public int DeleteAllTransactions ()
+        public int DeleteAllTransactions()
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Transaction_Logs";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Transaction_Logs";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -311,17 +255,10 @@ namespace ExpenseTrackerLibrary
         public int DeleteTransaction(int transactionId)
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Transaction_Logs" +
-                    $" WHERE Id={transactionId}";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Transaction_Logs" +
+                $" WHERE Id={transactionId}";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -330,19 +267,12 @@ namespace ExpenseTrackerLibrary
         /// were affected (To be used mostly for Unit tests).
         /// </summary>
         /// <returns></returns>
-        public int DeleteAllCategories ()
+        public int DeleteAllCategories()
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Category_Logs";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Category_Logs";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -352,20 +282,13 @@ namespace ExpenseTrackerLibrary
         /// </summary>
         /// <param name="title"></param>
         /// <returns></returns>
-        public int DeleteCategory (string title)
+        public int DeleteCategory(string title)
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Category_Logs" +
-                    $" WHERE Title = '{title}'";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Category_Logs" +
+                $" WHERE Title = '{title}'";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -378,17 +301,10 @@ namespace ExpenseTrackerLibrary
         public int DeleteCategory(int categoryId)
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Category_Logs" +
-                    $" WHERE Id = '{categoryId}'";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Category_Logs" +
+                $" WHERE Id = '{categoryId}'";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -397,19 +313,12 @@ namespace ExpenseTrackerLibrary
         /// were affected (To be used mostly for Unit tests).
         /// </summary>
         /// <returns></returns>
-        public int DeleteAllAccounts ()
+        public int DeleteAllAccounts()
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Accounts_Logs";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Accounts_Logs";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -422,17 +331,10 @@ namespace ExpenseTrackerLibrary
         public int DeleteAccounts(int accountsId)
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Accounts_Logs" +
-                    $" WHERE Id = '{accountsId}'";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Accounts_Logs" +
+                $" WHERE Id = '{accountsId}'";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -441,19 +343,12 @@ namespace ExpenseTrackerLibrary
         /// were affected (To be used mostly for Unit tests).
         /// </summary>
         /// <returns></returns>
-        public int DeleteAllKeywords ()
+        public int DeleteAllKeywords()
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
-            {
-                databaseConnection.ConnectionString = connectionString;
-                databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Keywords_Logs";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
-                databaseConnection.Close();
-            }
+            string commandText =
+                $"DELETE FROM Keywords_Logs";
+            affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
 
@@ -466,18 +361,67 @@ namespace ExpenseTrackerLibrary
         public int DeleteKeyword(string keyword)
         {
             int affectedRows;
-            using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
+            string commandText =
+                $"DELETE FROM Keywords_Logs" +
+                $" WHERE Word = '{keyword}'";
+            affectedRows = ExecuteNonQueryCommand(commandText);
+            return affectedRows;
+        }
+
+        /// <summary>
+        /// Executes the Non-Query command against the database and returns the number
+        /// of affected rows.
+        /// </summary>
+        /// <param name="cmndText"></param>
+        /// <returns></returns>
+        private int ExecuteNonQueryCommand(string cmndText)
+        {
+            int affectedRows;
+            using (SqliteConnection databaseConnection = new SqliteConnection(connectionString))
             {
-                databaseConnection.ConnectionString = connectionString;
                 databaseConnection.Open();
-                var sqliteCommand = databaseConnection.CreateCommand();
-                sqliteCommand.CommandText =
-                    $"DELETE FROM Keywords_Logs" +
-                    $" WHERE Word = '{keyword}'";
-                affectedRows = sqliteCommand.ExecuteNonQuery();
+                var databaseCommand = databaseConnection.CreateCommand();
+                databaseCommand.CommandText = cmndText;
+                affectedRows= databaseCommand.ExecuteNonQuery();
+            }
+                // **** this one is using The Sqlite-net-pcl package
+                /*
+                using (SQLite.SQLiteConnection databaseConnection = new SQLite.SQLiteConnection(connectionString))
+                {
+                    var sqliteCommand = databaseConnection.CreateCommand(cmndText);
+                    affectedRows = sqliteCommand.ExecuteNonQuery();
+                    databaseConnection.Close();
+                }
+                */
+                return affectedRows;
+        }
+
+        /// <summary>
+        /// Executes Scalar against the database and returns the returned Row Id (Id).
+        /// </summary>
+        /// <param name="cmndText"></param>
+        /// <returns></returns>
+        private int ExecuteScalarRowId(string cmndText)
+        {
+            int rowId;
+            using (SqliteConnection databaseConnection = new SqliteConnection(connectionString))
+            {
+                databaseConnection.Open();
+                var databaseCommand = databaseConnection.CreateCommand();
+                databaseCommand.CommandText = cmndText;
+                rowId = Convert.ToInt32(databaseCommand.ExecuteScalar());
+            }
+
+            // **** this one is using The Sqlite-net-pcl package
+            /*
+            using (SQLite.SQLiteConnection databaseConnection = new SQLite.SQLiteConnection(connectionString))
+            {
+                var sqliteCommand = databaseConnection.CreateCommand(cmndText);
+                rowId = sqliteCommand.ExecuteScalar<int>();
                 databaseConnection.Close();
             }
-            return affectedRows;
+            */
+            return rowId;
         }
     }
 

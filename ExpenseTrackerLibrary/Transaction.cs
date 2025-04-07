@@ -109,7 +109,7 @@ namespace ExpenseTrackerLibrary
             _amount = amount;
             _isImportant = isImportant;
             // Keywords should be checked
-            if (keywords != null)
+            if (keywords != null && keywords.Length>0)
             {
                 if (FormatAndFilter.AreKeywordsAllowed(keywords))
                 {
@@ -125,7 +125,7 @@ namespace ExpenseTrackerLibrary
                 }
                 else
                 {
-                    throw new ArgumentException("keywords[] is either Null or contains at least one invalid elements");
+                    throw new ArgumentException("keywords[] contains at least one invalid elements");
                 }
             }
             else
@@ -134,7 +134,7 @@ namespace ExpenseTrackerLibrary
                 _hasKeywords = false;
             }
             // Title should be checked
-            if (title != null)
+            if (title != null && title != string.Empty)
             {
                 if (FormatAndFilter.IsTransactionTitleAllowed(title))
                 {
@@ -205,6 +205,34 @@ namespace ExpenseTrackerLibrary
                 _hasNote = false;
             }
             _imagePath = imagePath;
+        }
+
+        /// <inheritdoc/>
+        public bool Update ()
+        {
+            int affectedRows = Globals.Database.Writer.UpdateTransaction(this);
+            if (affectedRows == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Remove ()
+        {
+            int affectedRows = Globals.Database.Writer.DeleteTransaction(Id);
+            if (affectedRows == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
