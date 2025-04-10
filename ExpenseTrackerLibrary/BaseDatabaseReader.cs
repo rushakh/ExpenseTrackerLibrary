@@ -304,12 +304,13 @@ namespace ExpenseTrackerLibrary
             // It's better for now to search for the keyword in the loaded transactions to prevent
             // problems occuring, since all keywords are in one column and seperated by a single
             // character. *** might change this if I find a better solution or a better design.
+            string hashedKeyword = FormatAndFilter.AddHashToKeyword(keyword);
             var allTransactions = GetAllTransactions();
             if (allTransactions is not null && allTransactions.Any())
             {
                 var foundTransactions = from transaction in allTransactions
                                         where transaction.HasKeywords
-                                        where transaction.Keywords!.Contains(keyword)
+                                        where transaction.Keywords!.Contains(hashedKeyword)
                                         orderby transaction.Date descending
                                         select transaction;
                 if (foundTransactions.Any())
@@ -467,6 +468,7 @@ namespace ExpenseTrackerLibrary
         {
             if (word is null || word == string.Empty) { throw new ArgumentException(); }
             bool exists;
+            string hashedKeyword = FormatAndFilter.AddHashToKeyword(word);
             using (var databaseConnection = new Microsoft.Data.Sqlite.SqliteConnection())
             {
                 databaseConnection.ConnectionString = connectionString;
@@ -474,7 +476,7 @@ namespace ExpenseTrackerLibrary
                 var databaseQuery = databaseConnection.CreateCommand();
                 databaseQuery.CommandText = $"SELECT Word" +
                     $" FROM Keywords_Logs" +
-                    $" WHERE Word = '{word}'";
+                    $" WHERE Word = '{hashedKeyword}'";
                 var filteredDatabaseReader = databaseQuery.ExecuteReader();
                 if (filteredDatabaseReader.HasRows) { exists = true; }
                 else { exists = false; }

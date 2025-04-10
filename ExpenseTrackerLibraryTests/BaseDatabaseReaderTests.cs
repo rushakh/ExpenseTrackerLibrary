@@ -79,14 +79,12 @@ namespace ExpenseTrackerLibrary.Tests
         {
             DatabaseManager dbManager = DatabaseManager.Instance;
             DatabaseInitialization.DatabaseInit();
-            // Default keywords should exist after initialization
-            string[]? testKeywords = dbManager.Reader.GetAllKeywords();
-            Assert.IsNotNull (testKeywords);
-            dbManager.Writer.DeleteAllKeywords ();
-            testKeywords = dbManager.Reader.GetAllKeywords();
+            dbManager.Writer.DeleteAllKeywords();
+            // No keyword should be in the database now
+            string[]? testKeywords = dbManager.Reader.GetAllKeywords();           
             Assert.IsNull (testKeywords);
-            dbManager.Writer.AddKeyword("test Keyword");
-            dbManager.Writer.AddKeyword("test Keyword");
+            dbManager.Writer.AddKeyword("#Test");
+            dbManager.Writer.AddKeyword("#Test2");
             testKeywords = dbManager.Reader.GetAllKeywords();
             Assert.IsNotNull(testKeywords);
             Assert.AreEqual (2, testKeywords.Length);
@@ -438,11 +436,11 @@ namespace ExpenseTrackerLibrary.Tests
             dbManager.Writer.DeleteAllCategories();
             dbManager.Writer.DeleteAllKeywords();
 
-            string keywordToSeach = "Salary";
-            bool testItExists = dbManager.Reader.KeywordExists(keywordToSeach);
+            string keywordToSearch = "Salary";
+            bool testItExists = dbManager.Reader.KeywordExists(keywordToSearch);
             Assert.IsFalse(testItExists);
-            dbManager.Writer.AddKeyword(keywordToSeach);
-            testItExists = dbManager.Reader.KeywordExists(keywordToSeach);
+            dbManager.Writer.AddKeyword(keywordToSearch);
+            testItExists = dbManager.Reader.KeywordExists(keywordToSearch);
             Assert.IsTrue(testItExists);
             //
             dbManager.Writer.DeleteAllTransactions();

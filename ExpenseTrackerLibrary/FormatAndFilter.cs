@@ -143,5 +143,21 @@ namespace ExpenseTrackerLibrary
             }
         }
 
+        /// <summary>
+        /// Adds # to the beginning of every keyword in a list if they do not have it.
+        /// </summary>
+        /// <param name="keywords"></param>
+        /// <returns></returns>
+        internal static string[] AddHashToKeywords(string[] keywords)
+        {
+            List<string> keywordsList = new List<string>();
+            foreach (string keyword in keywords)
+            {
+                string readyKeyword = AddHashToKeyword(keyword);
+                keywordsList.Add(readyKeyword);
+            }
+            return keywordsList.ToArray();
+        }
+
     }
 }

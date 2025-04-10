@@ -42,18 +42,56 @@ namespace ExpenseTrackerLibrary
                 return _keywords;
             }
             set 
-            { 
-                _keywords = value;
-                if (_keywords is not null && _keywords.Length > 0)
+            {
+                if (value is null)
                 {
-                    _hasKeywords = true;
+                    _keywords = null;
+                    _hasKeywords = false;
                 }
+                else
+                {
+                    if (value.Length > 0 && FormatAndFilter.AreKeywordsAllowed(value))
+                    {
+                        string[] readyKeywords = FormatAndFilter.AddHashToKeywords(value);
+                        _keywords = readyKeywords;
+                        _hasKeywords = true;
+                    }
+                    else
+                    {
+                        _hasKeywords = false;
+                        throw new ArgumentException("Either The string array is empty or the elements contain characters that are not allowed.");
+                    }
+                }                 
             } 
         }
         /// <inheritdoc/>
         public Category Category { get => _category; set => _category = value; }
         /// <inheritdoc/>
-        public string? Title { get => _title; set => _title = value; }
+        public string? Title
+        {
+            get 
+            { 
+                return _title;
+            }
+            set 
+            {
+                if (value is null)
+                {
+                    _title = null;
+                }
+                else
+                {
+                    if (FormatAndFilter.IsTransactionTitleAllowed(value))
+                    {
+                        _title = value;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Input string contains characters that are not allowed.");
+                    }
+                }
+            }
+        }
         /// <inheritdoc/>
         public string? Note 
         {
@@ -68,6 +106,10 @@ namespace ExpenseTrackerLibrary
                 {
                     _hasNote = true;
                 }
+                else
+                {
+                    _hasNote = false;
+                }
             } 
         }
         /// <inheritdoc/>
@@ -75,20 +117,7 @@ namespace ExpenseTrackerLibrary
         /// <inheritdoc/>
         public bool HasKeywords { get => _hasKeywords; }
         /// <inheritdoc/>
-        public bool HasNote
-        {
-            get
-            {
-                if (_note is null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        }
+        public bool HasNote { get => _hasNote; }
 
         /// <summary>
         /// Constructor that should be used to construct a new object of type Transaction.
@@ -113,7 +142,8 @@ namespace ExpenseTrackerLibrary
             {
                 if (FormatAndFilter.AreKeywordsAllowed(keywords))
                 {
-                    _keywords = keywords;
+                    string[] readyKeywords = FormatAndFilter.AddHashToKeywords(keywords);
+                    _keywords = readyKeywords;
                     if (_keywords is not null && _keywords.Length > 0)
                     {
                         _hasKeywords = true;

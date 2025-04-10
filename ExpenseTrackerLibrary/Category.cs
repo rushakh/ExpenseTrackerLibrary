@@ -24,7 +24,26 @@ namespace ExpenseTrackerLibrary
         /// <inheritdoc/>
         public Globals.CategoryTypes CategoryType { get => _categoryType; set => _categoryType = value;}
         /// <inheritdoc/>
-        public string Title { get => _title; set => _title = value; }
+        public string Title 
+        { 
+            get 
+            { 
+                return _title;
+            }
+            set 
+            {
+                if (value is not null && value != string.Empty)
+                {
+                    if (value == _title) { _title = value; }
+                    else if (FormatAndFilter.IsCategoryAllowed(value)) { _title = value; }
+                    else { throw new ArgumentException("The input string is not permitted. Either a Category with that name already exists or the string contains characters that are not allowed."); }
+                }
+                else
+                {
+                    throw new ArgumentException("Title cannot be null, empty string, or a duplicate.");
+                }
+            }
+        }
         /// <inheritdoc/>
         public bool isDefaultCategory { get => _isDefaultCategory; }
         /// <inheritdoc/>

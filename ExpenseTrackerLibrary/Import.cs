@@ -13,6 +13,8 @@ namespace ExpenseTrackerLibrary
     /// from text (*and in the future other formats*) into the database.
     /// The Order of Data should be set beforehand otherwise, by default, it's assumed
     /// that its Amount of money, the title, and then the date.
+    /// *** This is an automatic import so obviously there are going to be inaccurasies
+    /// in some cases.
     /// </summary>
     public static class Import
     {
@@ -93,6 +95,8 @@ namespace ExpenseTrackerLibrary
             if (textToImport == string.Empty) { throw new ArgumentException(); }
             bool isSuccessful = false;
             bool isImportant = false;
+            string[] keywords = { "#Imported" };
+            string note = "Imported Transaction";
             string tempToImportText;
             // removing ignore string
             tempToImportText = RemoveString(textToImport, ignore);
@@ -118,7 +122,7 @@ namespace ExpenseTrackerLibrary
                 (_dateTime, _amount, _title) = ExtractTransactionData(tempToImportText, isDDMMYYYYOrReverse);
             }
             // Importing
-            Transaction importTransaction = new Transaction(_dateTime, _amount, transactionType, isImportant, null, category, _title, null, null);
+            Transaction importTransaction = new Transaction(_dateTime, _amount, transactionType, isImportant, keywords, category, _title, note, null);
             // Having an Id means that it has been added to the database.
             if (importTransaction.Id != 0) { isSuccessful = true; }
             return isSuccessful;

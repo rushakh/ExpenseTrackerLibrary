@@ -117,8 +117,11 @@ namespace ExpenseTrackerLibrary
         {
             int keywordId;
             string checkedKeyword;
-            if (keyword is not null) { checkedKeyword = keyword; }
-            else { checkedKeyword = string.Empty; }
+            if (keyword is not null && keyword != string.Empty && FormatAndFilter.IsKeywordAllowed(keyword)) 
+            { 
+                checkedKeyword = FormatAndFilter.AddHashToKeyword(keyword);
+            }
+            else { throw new ArgumentException(); }
 
             string commandText =
                 $"INSERT INTO Keywords_Logs(Word)" +
@@ -224,10 +227,12 @@ namespace ExpenseTrackerLibrary
         public int UpdateKeyword(string keyword, string editedKeyword)
         {
             int affectedRows;
+            string hashedKeyword = FormatAndFilter.AddHashToKeyword(keyword);
+            string hashedEditedKeyword = FormatAndFilter.AddHashToKeyword(editedKeyword);
             string commandText =
                 $"UPDATE Keywords_Logs" +
-                $" SET Word = '{editedKeyword}'" +
-                $" WHERE Word = '{keyword}';";
+                $" SET Word = '{hashedEditedKeyword}'" +
+                $" WHERE Word = '{hashedKeyword}';";
             affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }
@@ -361,9 +366,10 @@ namespace ExpenseTrackerLibrary
         public int DeleteKeyword(string keyword)
         {
             int affectedRows;
+            string hashedKeyword = FormatAndFilter.AddHashToKeyword(keyword);
             string commandText =
                 $"DELETE FROM Keywords_Logs" +
-                $" WHERE Word = '{keyword}'";
+                $" WHERE Word = '{hashedKeyword}'";
             affectedRows = ExecuteNonQueryCommand(commandText);
             return affectedRows;
         }

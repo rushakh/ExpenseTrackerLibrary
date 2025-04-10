@@ -16,8 +16,11 @@ namespace ExpenseTrackerLibrary.Tests
         public void TransactionTest()
         {
             DatabaseManager dbManager = DatabaseManager.Instance;
-            // First We will clear the database of all other transactions.
+            DatabaseInitialization.DatabaseInit();
+            // First We will clear the database of all other transaction, categories, etc.s.
             dbManager.Writer.DeleteAllTransactions();
+            dbManager.Writer.DeleteAllCategories();
+            dbManager.Writer.DeleteAllKeywords();
             // the transaction Id will be there after constructing the object, as it is received
             // from the database.
             int testId;
@@ -30,7 +33,7 @@ namespace ExpenseTrackerLibrary.Tests
             string? testImagePath = null; // No need for this at this point
             bool testIsImportant = true;
             Globals.TransactionTypes testTransactionType = Globals.TransactionTypes.Expense;
-            string[] testKeywords = {"Test", "Yay" };
+            string[] testKeywords = {"#Test", "#Yay" };
             // Now to construct the object
             Transaction testTransaction = 
                 new Transaction(testDateTime, testAmount, testTransactionType, testIsImportant,
@@ -44,7 +47,9 @@ namespace ExpenseTrackerLibrary.Tests
             Assert.AreEqual<decimal>(testAmount, testTransaction.Amount);
             Assert.AreEqual<bool>(testIsImportant, testTransaction.IsImportant);
             Assert.AreEqual<string>(testTitle, testTransaction.Title);
-            Assert.AreEqual<string[]>(testKeywords, testTransaction.Keywords);
+            Assert.AreEqual<int>(2, testTransaction.Keywords.Length);
+            Assert.AreEqual<string>(testKeywords[0], testTransaction.Keywords[0]);
+            Assert.AreEqual<string>(testKeywords[1], testTransaction.Keywords[1]);
             Assert.AreEqual<string>(testNote, testTransaction.Note);
             Assert.IsTrue(testTransaction.HasNote);
             Assert.IsTrue(testTransaction.HasKeywords);
